@@ -15,14 +15,19 @@ body {
   text-align: center;
 }
 
-/* 로고 */
+/* 🔥 반응형 위치 */
+.centered {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: clamp(90px, 20vh, 200px);
+}
+
 .logo {
   width: 100px;
   margin-top: 15px;
-  cursor: pointer;
 }
 
-/* 뒤로가기 */
 .back-btn {
   position: fixed;
   top: 15px;
@@ -75,7 +80,6 @@ h3 {
   font-weight: 700;
 }
 
-/* 카드 */
 .card {
   position: relative;
   width: 90%;
@@ -88,7 +92,6 @@ h3 {
   overflow: hidden;
 }
 
-/* 워터마크 */
 .card::before {
   content: "";
   position: absolute;
@@ -102,13 +105,11 @@ h3 {
   transform: translate(-50%, -50%);
 }
 
-/* 만료 카드 */
 .expired-card {
   filter: grayscale(100%);
   opacity: 0.6;
 }
 
-/* 사용불가 도장 */
 .stamp {
   position: absolute;
   top: 50%;
@@ -119,11 +120,9 @@ h3 {
   font-size: 32px;
   font-weight: 700;
   padding: 10px 20px;
-  opacity: 0.8;
   background: rgba(255,255,255,0.3);
 }
 
-/* 프로필 */
 .profile {
   width: 140px;
   height: 140px;
@@ -162,20 +161,19 @@ h3 {
 </style>
 </head>
 
-<body>
+<body class="centered">
 
 <div class="back-btn" onclick="goBack()">←</div>
 
-<!-- 로고 -->
 <img src="https://raw.githubusercontent.com/fafafadola/member-card/main/logo.png" class="logo">
 
 <h1>한강지키기운동 남양주지역본부</h1>
 <h3>회원 검색</h3>
 
-<div class="search-box">
+<form class="search-box" onsubmit="searchMember(); return false;">
   <input type="text" id="nameInput" placeholder="이름 입력">
-  <button onclick="searchMember()">검색</button>
-</div>
+  <button type="submit">검색</button>
+</form>
 
 <div id="result"></div>
 
@@ -193,6 +191,8 @@ fetch(sheetURL)
 });
 
 function searchMember() {
+  document.body.classList.remove("centered");
+
   const name = document.getElementById("nameInput").value.trim();
   const result = document.getElementById("result");
 
@@ -227,12 +227,17 @@ function selectMember(i){
   showSingle(currentFiltered[i]);
 }
 
+function parseDate(dateStr){
+  if(!dateStr) return null;
+  dateStr = dateStr.replace(/[.\//년월일]/g, "-");
+  return new Date(dateStr);
+}
+
 function showSingle(m){
   history.pushState({ page: "card" }, "", "");
 
-  const today = new Date();
-  const expiry = new Date(m.유효기간);
-  const isExpired = m.유효기간 && expiry < today;
+  const expiry = parseDate(m.유효기간);
+  const isExpired = expiry && expiry < new Date();
 
   document.querySelector(".back-btn").style.display = "block";
 
@@ -263,6 +268,7 @@ window.onpopstate = function(event) {
   if (!event.state) {
     document.getElementById("result").innerHTML = "";
     document.querySelector(".back-btn").style.display = "none";
+    document.body.classList.add("centered");
     return;
   }
 
