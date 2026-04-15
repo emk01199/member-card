@@ -15,7 +15,14 @@ body {
   text-align: center;
 }
 
-/* 뒤로가기 버튼 */
+/* 로고 */
+.logo {
+  width: 100px;
+  margin-top: 15px;
+  cursor: pointer;
+}
+
+/* 뒤로가기 */
 .back-btn {
   position: fixed;
   top: 15px;
@@ -32,14 +39,15 @@ body {
   display: none;
 }
 
-.logo {
-  width: 100px;
-  margin-top: 15px;
-}
-
 h1 {
   font-size: 22px;
   color: #1b5e20;
+  font-weight: 700;
+}
+
+h3 {
+  color: #1b5e20;
+  font-weight: 700;
 }
 
 .search-box {
@@ -64,9 +72,10 @@ h1 {
   border: none;
   background: #2e7d32;
   color: white;
-  font-weight: bold;
+  font-weight: 700;
 }
 
+/* 카드 */
 .card {
   position: relative;
   width: 90%;
@@ -76,13 +85,30 @@ h1 {
   background: white;
   padding: 25px 20px;
   border: 2px solid #2e7d32;
+  overflow: hidden;
 }
 
+/* 워터마크 */
+.card::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200px;
+  height: 200px;
+  background: url('https://raw.githubusercontent.com/fafafadola/member-card/main/logo.png') no-repeat center;
+  background-size: contain;
+  opacity: 0.08;
+  transform: translate(-50%, -50%);
+}
+
+/* 만료 카드 */
 .expired-card {
   filter: grayscale(100%);
   opacity: 0.6;
 }
 
+/* 사용불가 도장 */
 .stamp {
   position: absolute;
   top: 50%;
@@ -90,24 +116,48 @@ h1 {
   transform: translate(-50%, -50%) rotate(-20deg);
   border: 4px solid red;
   color: red;
-  font-size: 30px;
-  font-weight: bold;
+  font-size: 32px;
+  font-weight: 700;
   padding: 10px 20px;
+  opacity: 0.8;
   background: rgba(255,255,255,0.3);
 }
 
+/* 프로필 */
 .profile {
   width: 140px;
   height: 140px;
   border-radius: 10px;
   margin: 15px 0;
   object-fit: cover;
+  border: 1px solid #ccc;
 }
 
 .info-row {
   display: flex;
   justify-content: space-between;
   margin-bottom: 6px;
+}
+
+.marquee {
+  margin-top: 20px;
+  overflow: hidden;
+  white-space: nowrap;
+  border-top: 1px solid #ddd;
+  padding-top: 10px;
+}
+
+.marquee span {
+  display: inline-block;
+  padding-left: 100%;
+  animation: scrollText 10s linear infinite;
+  color: #1b5e20;
+  font-weight: 700;
+}
+
+@keyframes scrollText {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
 }
 </style>
 </head>
@@ -116,7 +166,11 @@ h1 {
 
 <div class="back-btn" onclick="goBack()">←</div>
 
-<h1>회원 검색</h1>
+<!-- 로고 -->
+<img src="https://raw.githubusercontent.com/fafafadola/member-card/main/logo.png" class="logo">
+
+<h1>한강지키기운동 남양주지역본부</h1>
+<h3>회원 검색</h3>
 
 <div class="search-box">
   <input type="text" id="nameInput" placeholder="이름 입력">
@@ -136,7 +190,6 @@ fetch(sheetURL)
 .then(data => members = data)
 .catch(err => {
   document.getElementById("result").innerHTML = "데이터 불러오기 실패";
-  console.error(err);
 });
 
 function searchMember() {
@@ -162,7 +215,7 @@ function searchMember() {
 function showList(filtered){
   document.querySelector(".back-btn").style.display = "block";
 
-  let html = "<h3>동명이인 선택</h3>";
+  let html = "<h4>동명이인 선택</h4>";
   filtered.forEach((m,i)=>{
     html += `<button onclick="selectMember(${i})">${m.이름} (${m.회원번호})</button><br>`;
   });
@@ -194,6 +247,10 @@ function showSingle(m){
       <div class="info-row"><span>이름</span><span>${m.이름}</span></div>
       <div class="info-row"><span>단체명</span><span>${m.단체명}</span></div>
       <div class="info-row"><span>유효기간</span><span>${m.유효기간}</span></div>
+
+      <div class="marquee">
+        <span>이 사람은 한강지키기운동 회원임을 인증합니다.</span>
+      </div>
     </div>
   `;
 }
