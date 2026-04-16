@@ -162,9 +162,15 @@ h3 {
 <div id="result"></div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbxSEPXfqoFlcxIxsIeYpM9y9t8RIlobXN_9v6B-z-ecOAOh-dWtab_vBWW0-0GwfaWf/exec";
+const sheetURL = "https://opensheet.elk.sh/1cxyCAgTDUbpvqTPVq3ZOqZQkw6lBGztqGWDjx7dyp7E/회원DB";
 
-// XSS 방지
+let members = [];
+
+// 🔥 최초 1회만 로딩
+fetch(sheetURL)
+.then(res => res.json())
+.then(data => members = data);
+
 function escapeHTML(str) {
   if (!str) return "";
   return String(str).replace(/[&<>"']/g, m => ({
@@ -176,15 +182,6 @@ function escapeHTML(str) {
   }[m]));
 }
 
-// 날짜 표시용
-function formatDate(dateStr) {
-  if (!dateStr) return '';
-  const d = new Date(dateStr);
-  if (isNaN(d.getTime())) return dateStr;
-  return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')}`;
-}
-
-// 날짜 비교용
 function parseDate(dateStr){
   if(!dateStr) return null;
   dateStr = String(dateStr).replace(/[.\s]/g,"-");
@@ -192,7 +189,14 @@ function parseDate(dateStr){
   return isNaN(d.getTime()) ? null : d;
 }
 
-async function searchMember() {
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return dateStr;
+  return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')}`;
+}
+
+function searchMember() {
 
   document.body.classList.remove("centered");
 
@@ -204,22 +208,14 @@ async function searchMember() {
     return;
   }
 
-  result.innerHTML = "검색중...";
+  const filtered = members.filter(m => m.이름 && m.이름.includes(name));
 
-  try {
-    const res = await fetch(API_URL + "?name=" + encodeURIComponent(name));
-    const data = await res.json();
-
-    if (!data.results || data.results.length === 0) {
-      result.innerHTML = "검색 결과 없음";
-      return;
-    }
-
-    showCard(data.results[0]);
-
-  } catch (e) {
-    result.innerHTML = "서버 오류";
+  if (filtered.length === 0) {
+    result.innerHTML = "검색 결과 없음";
+    return;
   }
+
+  showCard(filtered[0]);
 }
 
 function showCard(m) {
