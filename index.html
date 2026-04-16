@@ -1,15 +1,91 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>회원증 조회</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: "Noto Sans KR", sans-serif;
+  background: #e8f5e9;
+  text-align: center;
+}
+
+.centered {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 120px;
+}
+
+.search-box {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin: 20px;
+}
+
+input {
+  padding: 12px;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+  width: 200px;
+}
+
+button {
+  padding: 12px 16px;
+  border-radius: 20px;
+  border: none;
+  background: #2e7d32;
+  color: white;
+  font-weight: bold;
+}
+
+.card {
+  width: 320px;
+  margin: 20px auto;
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  border: 2px solid #2e7d32;
+}
+
+.profile {
+  width: 120px;
+  height: 120px;
+  border-radius: 10px;
+  object-fit: cover;
+  margin: 10px 0;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 6px 0;
+}
+
+.loading {
+  color: #2e7d32;
+  font-weight: bold;
+}
+</style>
+</head>
+
+<body class="centered">
+
+<h2>회원증 조회</h2>
+
+<div class="search-box">
+  <input type="text" id="nameInput" placeholder="이름 입력">
+  <button onclick="searchMember()">검색</button>
+</div>
+
+<div id="result"></div>
+
 <script>
-const sheetURL = "https://opensheet.elk.sh/1cxyCAgTDUbpvqTPVq3ZOqZQkw6lBGztqGWDjx7dyp7E/회원DB";
-
-let members = [];
-let lastSearch = 0;
-
-// 데이터 로딩
-fetch(sheetURL)
-  .then(res => res.json())
-  .then(data => {
-    members = data;
-  });
+const API_URL = "https://script.google.com/macros/s/여기에ID/exec";
 
 // 🔐 XSS 방지
 function escapeHTML(str) {
@@ -23,27 +99,21 @@ function escapeHTML(str) {
   }[m]));
 }
 
-// 🔥 날짜 포맷 (핵심 추가)
+// 🔥 날짜 포맷
 function formatDate(dateStr) {
   if (!dateStr) return '';
-
   const d = new Date(dateStr);
-
   if (isNaN(d.getTime())) return dateStr;
 
-  const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const d2 = String(d.getDate()).padStart(2,'0');
 
-  return `${year}-${month}-${day}`;
+  return `${y}-${m}-${d2}`;
 }
 
-// 검색
-function searchMember() {
-
-  const now = Date.now();
-  if (now - lastSearch < 1500) return;
-  lastSearch = now;
+// 🔥 검색 (서버 요청)
+async function searchMember() {
 
   const name = document.getElementById("nameInput").value.trim();
   const result = document.getElementById("result");
@@ -53,61 +123,43 @@ function searchMember() {
     return;
   }
 
-  if (name.length < 2) {
-    result.innerHTML = "2글자 이상 입력하세요";
-    return;
-  }
+  result.innerHTML = `<div class="loading">검색중...</div>`;
 
-  const filtered = members.filter(m => m.이름 === name);
+  try {
+    const res = await fetch(API_URL + "?name=" + encodeURIComponent(name));
+    const data = await res.json();
 
-  if (filtered.length === 0) {
-    result.innerHTML = "검색 결과 없음";
-    return;
-  }
+    if (!data.results || data.results.length === 0) {
+      result.innerHTML = "검색 결과 없음";
+      return;
+    }
 
-  if (filtered.length > 1) {
-    let html = "<h4>동명이인 선택</h4>";
-    filtered.forEach((m,i)=>{
-      html += `<button onclick="showCard(${i}, this.dataset.name)">
-        ${escapeHTML(m.이름)} (${escapeHTML(m.회원번호)})
-      </button><br>`;
-    });
-    document.getElementById("result").innerHTML = html;
-  } else {
-    showCard(0, filtered);
+    showCard(data.results[0]);
+
+  } catch (e) {
+    result.innerHTML = "오류 발생";
   }
 }
 
-// 카드 출력
-function showCard(index, list){
+// 🔥 카드 출력
+function showCard(m) {
 
-  const m = list ? list[index] : members.find(x => x.이름 === document.getElementById("nameInput").value);
-
-  const expiry = new Date(m.유효기간);
-  const isExpired = expiry && expiry < new Date();
+  const isExpired = new Date(m.유효기간) < new Date();
 
   document.getElementById("result").innerHTML = `
-    <div class="card ${isExpired ? 'expired-card' : ''}">
-      ${isExpired ? `<div class="stamp">사용불가</div>` : ""}
-
-      <h2>회원증</h2>
+    <div class="card ${isExpired ? 'expired' : ''}">
+      <h3>회원증</h3>
 
       <img src="${escapeHTML(m.사진URL)}" class="profile">
 
       <div class="info-row"><span>회원번호</span><span>${escapeHTML(m.회원번호)}</span></div>
       <div class="info-row"><span>이름</span><span>${escapeHTML(m.이름)}</span></div>
       <div class="info-row"><span>단체명</span><span>${escapeHTML(m.단체명)}</span></div>
-
-      <!-- 🔥 여기 유효기간 수정됨 -->
-      <div class="info-row">
-        <span>유효기간</span>
-        <span>${formatDate(m.유효기간)}</span>
-      </div>
-
-      <div class="marquee">
-        <span>이 회원은 인증된 사용자입니다.</span>
-      </div>
+      <div class="info-row"><span>유효기간</span><span>${formatDate(m.유효기간)}</span></div>
     </div>
   `;
 }
 </script>
+
+</body>
+</html>
