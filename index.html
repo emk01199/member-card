@@ -15,7 +15,7 @@ body {
   text-align: center;
 }
 
-/* 반응형 중앙 정렬 */
+/* 반응형 중앙 */
 .centered {
   display: flex;
   flex-direction: column;
@@ -94,7 +94,7 @@ h3 {
   transform: translate(-50%, -50%);
 }
 
-/* 만료 카드 */
+/* 만료 */
 .expired-card {
   filter: grayscale(100%);
   opacity: 0.6;
@@ -203,12 +203,10 @@ const sheetURL = "https://opensheet.elk.sh/1cxyCAgTDUbpvqTPVq3ZOqZQkw6lBGztqGWDj
 
 let members = [];
 
-// 최초 1회 로딩
 fetch(sheetURL)
 .then(res => res.json())
 .then(data => members = data.filter(m => m.이름));
 
-// XSS 방지
 function escapeHTML(str) {
   if (!str) return "";
   return String(str).replace(/[&<>"']/g, m => ({
@@ -220,7 +218,6 @@ function escapeHTML(str) {
   }[m]));
 }
 
-// 날짜 파싱
 function parseDate(dateStr){
   if(!dateStr) return null;
   dateStr = String(dateStr).replace(/[.\s]/g,"-");
@@ -228,7 +225,6 @@ function parseDate(dateStr){
   return isNaN(d.getTime()) ? null : d;
 }
 
-// 날짜 표시
 function formatDate(dateStr) {
   if (!dateStr) return '';
   const d = new Date(dateStr);
@@ -236,7 +232,6 @@ function formatDate(dateStr) {
   return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')}`;
 }
 
-// 검색
 function searchMember() {
 
   document.body.classList.remove("centered");
@@ -249,7 +244,6 @@ function searchMember() {
     return;
   }
 
-  // 🔥 로딩 UI
   result.innerHTML = `
     <div class="loader"></div>
     <div>검색중...</div>
@@ -266,10 +260,9 @@ function searchMember() {
 
     showCard(filtered[0]);
 
-  }, 300); // UX용 약간 딜레이
+  }, 300);
 }
 
-// 카드 출력
 function showCard(m) {
 
   const expiry = parseDate(m.유효기간);
