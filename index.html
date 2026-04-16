@@ -3,295 +3,117 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>회원증 조회</title>
-
+<title>회원증 조회 - 한강지키기운동</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
-
 <style>
-body {
-  margin: 0;
-  font-family: "Noto Sans KR", sans-serif;
-  background: #e8f5e9;
-  text-align: center;
-}
-
-/* 반응형 중앙 */
-.centered {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-top: clamp(80px, 18vh, 180px);
-}
-
-/* 로고 */
-.logo {
-  width: 100px;
-}
-
-/* 제목 */
-h1 {
-  font-size: 22px;
-  color: #1b5e20;
-  font-weight: 700;
-}
-
-h3 {
-  color: #1b5e20;
-  font-weight: 700;
-}
-
-/* 검색창 */
-.search-box {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin: 15px auto;
-  width: 90%;
-  max-width: 350px;
-}
-
-.search-box input {
-  flex: 1;
-  padding: 12px;
-  border-radius: 20px;
-  border: 1px solid #ccc;
-}
-
-.search-box button {
-  padding: 12px 16px;
-  border-radius: 20px;
-  border: none;
-  background: #2e7d32;
-  color: white;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-/* 카드 */
-.card {
-  position: relative;
-  width: 90%;
-  max-width: 340px;
-  margin: 20px auto;
-  border-radius: 12px;
-  background: white;
-  padding: 25px 20px;
-  border: 2px solid #2e7d32;
-  overflow: hidden;
-}
-
-/* 워터마크 */
-.card::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 200px;
-  height: 200px;
-  background: url('https://raw.githubusercontent.com/fafafadola/member-card/main/logo.png') no-repeat center;
-  background-size: contain;
-  opacity: 0.08;
-  transform: translate(-50%, -50%);
-}
-
-/* 만료 */
-.expired-card {
-  filter: grayscale(100%);
-  opacity: 0.6;
-}
-
-/* 도장 */
-.stamp {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) rotate(-20deg);
-  border: 4px solid red;
-  color: red;
-  font-size: 32px;
-  font-weight: 700;
-  padding: 10px 20px;
-  background: rgba(255,255,255,0.3);
-}
-
-/* 사진 */
-.profile {
-  width: 140px;
-  height: 140px;
-  border-radius: 10px;
-  margin: 15px 0;
-  object-fit: cover;
-  border: 1px solid #ccc;
-}
-
-/* 정보 */
-.info-row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 6px;
-}
-
-/* 흐르는 문구 */
-.marquee {
-  margin-top: 20px;
-  overflow: hidden;
-  white-space: nowrap;
-  border-top: 1px solid #ddd;
-  padding-top: 10px;
-}
-
-.marquee span {
-  display: inline-block;
-  padding-left: 100%;
-  animation: scrollText 10s linear infinite;
-  color: #1b5e20;
-  font-weight: 700;
-}
-
-@keyframes scrollText {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-100%); }
-}
-
-/* 로딩 스피너 */
-.loader {
-  border: 4px solid #eee;
-  border-top: 4px solid #2e7d32;
-  border-radius: 50%;
-  width: 30px;
-  height: 30px;
-  animation: spin 1s linear infinite;
-  margin: 20px auto;
-}
-
-@keyframes spin {
-  100% { transform: rotate(360deg); }
-}
-
-/* 카드 등장 애니메이션 */
-.fade-in {
-  opacity: 0;
-  transform: translateY(20px);
-  animation: fadeInUp 0.5s ease forwards;
-}
-
-@keyframes fadeInUp {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+  body { margin: 0; font-family: "Noto Sans KR", sans-serif; background: #e8f5e9; text-align: center; }
+  .centered { display: flex; flex-direction: column; align-items: center; padding-top: clamp(80px, 18vh, 180px); }
+  .logo { width: 100px; }
+  h1 { font-size: 22px; color: #1b5e20; font-weight: 700; margin-top: 15px; }
+  h3 { color: #1b5e20; font-weight: 700; font-size: 16px; margin-bottom: 20px; }
+  .search-box { display: flex; justify-content: center; gap: 8px; margin: 15px auto; width: 90%; max-width: 350px; }
+  .search-box input { flex: 1; padding: 12px; border-radius: 20px; border: 1px solid #ccc; outline: none; }
+  .search-box button { padding: 12px 16px; border-radius: 20px; border: none; background: #2e7d32; color: white; font-weight: 700; cursor: pointer; transition: background 0.3s; }
+  .search-box button:hover { background: #1b5e20; }
+  .card { position: relative; width: 90%; max-width: 340px; margin: 20px auto; border-radius: 12px; background: white; padding: 25px 20px; border: 2px solid #2e7d32; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+  .card::before { content: ""; position: absolute; top: 50%; left: 50%; width: 200px; height: 200px; background: url('https://raw.githubusercontent.com/fafafadola/member-card/main/logo.png') no-repeat center; background-size: contain; opacity: 0.08; transform: translate(-50%, -50%); pointer-events: none; }
+  .expired-card { filter: grayscale(100%); opacity: 0.6; }
+  .stamp { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-20deg); border: 4px solid red; color: red; font-size: 32px; font-weight: 700; padding: 10px 20px; background: rgba(255,255,255,0.3); z-index: 10; pointer-events: none; }
+  .profile { width: 140px; height: 140px; border-radius: 10px; margin: 15px 0; object-fit: cover; border: 1px solid #ccc; position: relative; z-index: 2; background: #f0f0f0; }
+  .info-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; border-bottom: 1px dashed #eee; padding-bottom: 4px; }
+  .info-row b { color: #1b5e20; }
+  .marquee { margin-top: 20px; overflow: hidden; white-space: nowrap; border-top: 1px solid #ddd; padding-top: 10px; }
+  .marquee span { display: inline-block; padding-left: 100%; animation: scrollText 12s linear infinite; color: #1b5e20; font-weight: 700; font-size: 13px; }
+  @keyframes scrollText { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+  .loader { border: 4px solid #eee; border-top: 4px solid #2e7d32; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto; }
+  @keyframes spin { 100% { transform: rotate(360deg); } }
+  .fade-in { opacity: 0; transform: translateY(20px); animation: fadeInUp 0.5s ease forwards; }
+  @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+  .error-msg { color: #d32f2f; margin-top: 20px; font-weight: 700; }
 </style>
 </head>
 
-<body class="centered">
+<body class="centered" oncontextmenu="return false" onselectstart="return false">
 
-<img src="https://raw.githubusercontent.com/fafafadola/member-card/main/logo.png" class="logo">
+  <img src="https://raw.githubusercontent.com/fafafadola/member-card/main/logo.png" class="logo" alt="Logo">
+  <h1>한강지키기운동 남양주지역본부</h1>
+  <h3>회원증 실시간 조회</h3>
 
-<h1>한강지키기운동 남양주지역본부</h1>
-<h3>회원 검색</h3>
+  <form class="search-box" onsubmit="searchMember(); return false;">
+    <input type="text" id="nameInput" placeholder="회원 성명 입력" autocomplete="off">
+    <button type="submit">조회하기</button>
+  </form>
 
-<form class="search-box" onsubmit="searchMember(); return false;">
-  <input type="text" id="nameInput" placeholder="이름 입력">
-  <button type="submit">검색</button>
-</form>
+  <div id="result"></div>
 
-<div id="result"></div>
+  <script>
+    // 유저님이 제공해주신 GAS 웹 앱 URL 적용 완료
+    const gasURL = "https://script.google.com/macros/s/AKfycbytBvH-ZM_In4vLtx38OSfnUe7FvDDLwhVFUVawu6DPXcfYeuB_415uhZf5NsXNn-nk/exec";
 
-<script>
-const sheetURL = "https://opensheet.elk.sh/1cxyCAgTDUbpvqTPVq3ZOqZQkw6lBGztqGWDjx7dyp7E/회원DB";
+    async function searchMember() {
+      const nameInput = document.getElementById("nameInput");
+      const name = nameInput.value.trim();
+      const resultDiv = document.getElementById("result");
 
-let members = [];
+      if (!name) {
+        alert("성함을 입력해 주세요.");
+        nameInput.focus();
+        return;
+      }
 
-fetch(sheetURL)
-.then(res => res.json())
-.then(data => members = data.filter(m => m.이름));
+      // 화면 레이아웃 조정 및 로딩 표시
+      document.body.classList.remove("centered");
+      resultDiv.innerHTML = `
+        <div class="loader"></div>
+        <div style="color:#2e7d32;">서버에서 정보를 가져오는 중입니다...</div>
+      `;
 
-function escapeHTML(str) {
-  if (!str) return "";
-  return String(str).replace(/[&<>"']/g, m => ({
-    '&':'&amp;',
-    '<':'&lt;',
-    '>':'&gt;',
-    '"':'&quot;',
-    "'":'&#39;'
-  }[m]));
-}
+      try {
+        // GAS 웹 앱 호출
+        const response = await fetch(`${gasURL}?name=${encodeURIComponent(name)}`);
+        const data = await response.json();
 
-function parseDate(dateStr){
-  if(!dateStr) return null;
-  dateStr = String(dateStr).replace(/[.\s]/g,"-");
-  const d = new Date(dateStr);
-  return isNaN(d.getTime()) ? null : d;
-}
+        if (data.error) {
+          resultDiv.innerHTML = `<p class="error-msg">⚠️ ${data.error}</p>`;
+          return;
+        }
 
-function formatDate(dateStr) {
-  if (!dateStr) return '';
-  const d = new Date(dateStr);
-  if (isNaN(d.getTime())) return dateStr;
-  return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')}`;
-}
-
-function searchMember() {
-
-  document.body.classList.remove("centered");
-
-  const name = document.getElementById("nameInput").value.trim();
-  const result = document.getElementById("result");
-
-  if (!name) {
-    result.innerHTML = "이름을 입력하세요";
-    return;
-  }
-
-  result.innerHTML = `
-    <div class="loader"></div>
-    <div>검색중...</div>
-  `;
-
-  setTimeout(() => {
-
-    const filtered = members.filter(m => m.이름 && m.이름.includes(name));
-
-    if (filtered.length === 0) {
-      result.innerHTML = "검색 결과 없음";
-      return;
+        renderCard(data);
+      } catch (error) {
+        console.error("Error:", error);
+        resultDiv.innerHTML = `<p class="error-msg">❌ 서버 통신 오류가 발생했습니다.<br>잠시 후 다시 시도해 주세요.</p>`;
+      }
     }
 
-    showCard(filtered[0]);
+    function renderCard(m) {
+      const today = new Date();
+      // 유효기간 데이터가 있을 경우 날짜 객체로 변환
+      const expiry = m.유효기간 ? new Date(m.유효기간) : null;
+      const isExpired = expiry && expiry < today;
 
-  }, 300);
-}
+      const cardHTML = `
+        <div class="card ${isExpired ? 'expired-card' : ''} fade-in">
+          ${isExpired ? `<div class="stamp">기간만료</div>` : ""}
+          <h2 style="color:#1b5e20; margin-top:0; margin-bottom:20px; letter-spacing:5px;">회 원 증</h2>
+          
+          <img src="${m.사진URL || 'https://via.placeholder.com/140?text=No+Image'}" 
+               class="profile" 
+               onerror="this.src='https://via.placeholder.com/140?text=No+Image'">
+          
+          <div style="text-align:left; width:100%; max-width:280px; margin: 0 auto;">
+            <div class="info-row"><b>회원번호</b><span>${m.회원번호 || '-'}</span></div>
+            <div class="info-row"><b>이름</b><span>${m.이름 || '-'}</span></div>
+            <div class="info-row"><b>단체명</b><span>${m.단체명 || '-'}</span></div>
+            <div class="info-row"><b>유효기간</b><span>${m.유효기간 || '기한없음'}</span></div>
+          </div>
 
-function showCard(m) {
-
-  const expiry = parseDate(m.유효기간);
-  const isExpired = expiry && expiry < new Date();
-
-  document.getElementById("result").innerHTML = `
-    <div class="card ${isExpired ? 'expired-card' : ''} fade-in">
-      ${isExpired ? `<div class="stamp">사용불가</div>` : ""}
-
-      <h2>회원증</h2>
-
-      <img src="${escapeHTML(m.사진URL)}" class="profile">
-
-      <div class="info-row"><span>회원번호</span><span>${escapeHTML(m.회원번호)}</span></div>
-      <div class="info-row"><span>이름</span><span>${escapeHTML(m.이름)}</span></div>
-      <div class="info-row"><span>단체명</span><span>${escapeHTML(m.단체명)}</span></div>
-
-      <div class="info-row">
-        <span>유효기간</span>
-        <span>${formatDate(m.유효기간)}</span>
-      </div>
-
-      <div class="marquee">
-        <span>이 사람은 한강지키기운동 회원임을 인증합니다.</span>
-      </div>
-    </div>
-  `;
-}
-</script>
-
+          <div class="marquee">
+            <span>한강지키기운동 남양주지역본부 회원임을 인증합니다.</span>
+          </div>
+        </div>
+      `;
+      document.getElementById("result").innerHTML = cardHTML;
+    }
+  </script>
 </body>
 </html>
