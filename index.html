@@ -1,180 +1,99 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>회원 조회 - 한강지키기운동</title>
-
-<meta name="robots" content="noindex, nofollow">
-
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
-
-<style>
-  body { margin: 0; font-family: "Noto Sans KR", sans-serif; background: #e8f5e9; text-align: center; }
-  .centered { display: flex; flex-direction: column; align-items: center; padding-top: clamp(80px, 18vh, 180px); }
-  .logo { width: 100px; margin-top: 15px; }
-  h1 { font-size: 22px; color: #1b5e20; font-weight: 700; margin-top: 15px; }
-  h3 { color: #1b5e20; font-weight: 700; font-size: 16px; margin-bottom: 20px; }
-  
-  .search-box { display: flex; justify-content: center; gap: 8px; margin: 15px auto; width: 90%; max-width: 350px; }
-  .search-box input { flex: 1; padding: 12px; border-radius: 20px; border: 1px solid #ccc; outline: none; }
-  .search-box button { padding: 12px 16px; border-radius: 20px; border: none; background: #2e7d32; color: white; font-weight: 700; cursor: pointer; }
-  .search-box button:disabled { background: #a5d6a7; cursor: not-allowed; }
-
-  .card { position: relative; width: 90%; max-width: 340px; margin: 20px auto; border-radius: 12px; background: white; padding: 25px 20px; border: 2px solid #2e7d32; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); box-sizing: border-box; }
-  .card::before { content: ""; position: absolute; top: 50%; left: 50%; width: 200px; height: 200px; background: url('https://raw.githubusercontent.com/fafafadola/member-card/main/logo.png') no-repeat center; background-size: contain; opacity: 0.08; transform: translate(-50%, -50%); pointer-events: none; }
-  
-  .expired-card { filter: grayscale(100%); opacity: 0.6; }
-  .stamp { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-20deg); border: 4px solid red; color: red; font-size: 32px; font-weight: 700; padding: 10px 20px; background: rgba(255,255,255,0.3); z-index: 10; pointer-events: none; }
-  
-  .profile { width: 140px; height: 140px; border-radius: 10px; margin: 15px 0; object-fit: cover; border: 1px solid #ccc; position: relative; z-index: 2; background: #f0f0f0; }
-  .profile-fallback { width: 140px; height: 140px; border-radius: 10px; margin: 15px 0; border: 1px solid #ccc; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 48px; color: #2e7d32; position: relative; z-index: 2; }
-  
-  .info-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; border-bottom: 1px dashed #eee; padding-bottom: 4px; }
-  .info-row b { color: #1b5e20; }
-  
-  .marquee { margin-top: 20px; overflow: hidden; white-space: nowrap; border-top: 1px solid #ddd; padding-top: 10px; height: 30px; }
-  .marquee span { display: inline-block; padding-left: 100%; animation: scrollText 15s linear infinite; color: #1b5e20; font-weight: 700; font-size: 13px; }
-  
-  @keyframes scrollText { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
-  
-  .loader { border: 4px solid #eee; border-top: 4px solid #2e7d32; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto; }
-  @keyframes spin { 100% { transform: rotate(360deg); } }
-  
-  .fade-in { opacity: 0; animation: fadeIn 0.5s forwards; }
-  @keyframes fadeIn { to { opacity: 1; } }
-
-  .dup-btn { display: block; margin: 8px auto; padding: 10px 20px; border-radius: 20px; border: 1px solid #2e7d32; background: white; color: #1b5e20; font-weight: 700; cursor: pointer; font-size: 14px; width: 80%; max-width: 300px; }
-  .dup-btn:hover { background: #e8f5e9; }
-</style>
-</head>
-
-<body class="centered" oncontextmenu="return false" onselectstart="return false">
-
-<img src="https://raw.githubusercontent.com/fafafadola/member-card/main/logo.png" class="logo">
-<h1>한강지키기운동 남양주지역본부</h1>
-<h3>회원 조회</h3>
-
-<form class="search-box" onsubmit="searchMember(); return false;">
-  <input type="text" id="nameInput" placeholder="회원 성명 입력" autocomplete="off" maxlength="10">
-  <button type="submit" id="searchBtn">조회하기</button>
-</form>
-
-<div id="result"></div>
-
 <script>
-// ✅ 여기에 Apps Script 배포 URL 입력
-const gasURL = 'https://script.google.com/macros/s/AKfycbytBvH-ZM_In4vLtx38OSfnUe7FvDDLwhVFUVawu6DPXcfYeuB_415uhZf5NsXNn-nk/exec';
+const sheetURL = "https://opensheet.elk.sh/1cxyCAgTDUbpvqTPVq3ZOqZQkw6lBGztqGWDjx7dyp7E/회원DB";
 
-let isSearching = false;
+let members = [];
+let currentFiltered = [];
 
-function escapeHTML(str) {
-  if (!str) return '';
-  return String(str).replace(/[&<>"']/g, m => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-  }[m]));
-}
+fetch(sheetURL)
+.then(res => res.json())
+.then(data => members = data);
 
-async function searchMember() {
-  if (isSearching) return;
-  const name = document.getElementById('nameInput').value.trim();
-  const result = document.getElementById('result');
-  const btn = document.getElementById('searchBtn');
+/* 🔍 검색 */
+function searchMember() {
+  const name = document.getElementById("nameInput").value.trim();
+  const result = document.getElementById("result");
 
-  if (!name) { alert("성함을 입력해 주세요."); return; }
-  if (name.length < 2) { alert("2글자 이상 입력하세요."); return; }
+  const filtered = members.filter(m => m.이름.includes(name));
+  currentFiltered = filtered;
 
-  isSearching = true;
-  btn.disabled = true;
-  document.body.classList.remove("centered");
-  result.innerHTML = `<div class="loader"></div>`;
+  if (filtered.length === 0) {
+    result.innerHTML = "검색 결과 없음";
+    return;
+  }
 
-  try {
-    const response = await fetch(`${gasURL}?name=${encodeURIComponent(name)}`);
-    const data = await response.json();
-    
-    if (data.error) {
-      result.innerHTML = `<p style="color:red; margin-top:20px;">${escapeHTML(data.error)}</p>`;
-    } else if (!data.results || data.results.length === 0) {
-      result.innerHTML = `<p style="margin-top:20px;">검색 결과가 없습니다.</p>`;
-    } else if (data.results.length > 1) {
-      showDuplicatePicker(data.results);
-    } else {
-      showCard(data.results[0]);
-    }
-  } catch (e) {
-    result.innerHTML = `<p style="color:red; margin-top:20px;">연결 실패</p>`;
-  } finally {
-    isSearching = false;
-    btn.disabled = false;
+  if (filtered.length > 1) {
+    showList(filtered);
+    history.pushState({ page: "list" }, "", ""); // 🔥 기록
+  } else {
+    showSingle(filtered[0]);
   }
 }
 
-function showDuplicatePicker(members) {
-  const result = document.getElementById('result');
-  let html = '<h4 style="color:#1b5e20; margin-top:20px;">동명이인이 있습니다. 선택하세요.</h4>';
-  members.forEach((m, i) => {
-    html += `<button class="dup-btn" onclick="showCardByIndex(${i})">${escapeHTML(m['이름'])} (${escapeHTML(m['회원번호'])})</button>`;
+/* 👥 동명이인 리스트 */
+function showList(filtered){
+  document.querySelector(".back-btn").style.display = "block";
+
+  let html = "<h4>동명이인 선택</h4>";
+  filtered.forEach((m,i)=>{
+    html += `<button onclick="selectMember(${i})">${m.이름} (${m.회원번호})</button><br>`;
   });
-  result.innerHTML = html;
-  result._members = members;
+
+  document.getElementById("result").innerHTML = html;
 }
 
-function showCardByIndex(i) {
-  const members = document.getElementById('result')._members;
-  if (members && members[i]) showCard(members[i]);
+/* 👇 선택 */
+function selectMember(i){
+  showSingle(currentFiltered[i]);
 }
 
-function showCard(m) {
-  const result = document.getElementById('result');
-  const today = new Date(); today.setHours(0,0,0,0);
-  const expiryStr = m['유효기간'] || '';
-  let isExpired = false;
+/* 🪪 회원증 */
+function showSingle(m){
+  history.pushState({ page: "card" }, "", ""); // 🔥 기록
 
-  if (expiryStr) {
-    const p = expiryStr.split('-');
-    const exp = new Date(p[0], p[1]-1, p[2]);
-    if (!isNaN(exp) && exp < today) isExpired = true;
+  const today = new Date();
+  const expiry = new Date(m.유효기간);
+  const isExpired = m.유효기간 && expiry < today;
+
+  document.querySelector(".back-btn").style.display = "block";
+
+  document.getElementById("result").innerHTML = `
+    <div class="card ${isExpired ? 'expired-card' : ''}">
+      ${isExpired ? `<div class="stamp">사용불가</div>` : ""}
+
+      <h2>회원증</h2>
+      <img src="${m.사진URL}" class="profile">
+
+      <div class="info-row"><span>회원번호</span><span>${m.회원번호}</span></div>
+      <div class="info-row"><span>이름</span><span>${m.이름}</span></div>
+      <div class="info-row"><span>단체명</span><span>${m.단체명}</span></div>
+      <div class="info-row"><span>유효기간</span><span>${m.유효기간}</span></div>
+    </div>
+  `;
+}
+
+/* 🔙 뒤로가기 버튼 */
+function goBack(){
+  history.back();
+}
+
+/* 📱 브라우저/핸드폰 뒤로가기 처리 */
+window.onpopstate = function(event) {
+
+  // 아무 상태 없으면 → 메인
+  if (!event.state) {
+    document.getElementById("result").innerHTML = "";
+    document.querySelector(".back-btn").style.display = "none";
+    return;
   }
 
-  // 사진 주소 처리 (Google Drive 직접 주소 변환 포함)
-  let pUrl = m['사진URL'] || '';
-  if (pUrl.includes('id=')) {
-    const id = pUrl.split('id=')[1].split('&')[0];
-    pUrl = `https://docs.google.com/uc?export=view&id=${id}`;
+  // 리스트 상태
+  if (event.state.page === "list") {
+    showList(currentFiltered);
   }
 
-  const photoHTML = pUrl 
-    ? `<img src="${escapeHTML(pUrl)}" class="profile" onerror="this.parentNode.replaceChild(fallbackIcon('${escapeHTML(m['이름'])}'), this)">`
-    : `<div class="profile-fallback">${escapeHTML(m['이름'] ? m['이름'][0] : '?')}</div>`;
-
-  result.innerHTML = `
-    <div class="card ${isExpired ? 'expired-card' : ''} fade-in">
-      ${isExpired ? '<div class="stamp">기간만료</div>' : ''}
-      <h2 style="color:#1b5e20; margin-bottom:20px; letter-spacing:5px;">회 원 증</h2>
-      
-      ${photoHTML}
-
-      <div style="text-align:left; width:260px; margin:0 auto;">
-        <div class="info-row"><b>회원번호</b><span>${escapeHTML(m['회원번호'])}</span></div>
-        <div class="info-row"><b>이름</b><span>${escapeHTML(m['이름'])}</span></div>
-        <div class="info-row"><b>단체명</b><span>${escapeHTML(m['단체명'])}</span></div>
-        <div class="info-row"><b>유효기간</b><span>${escapeHTML(expiryStr)}</span></div>
-      </div>
-      
-      <div class="marquee">
-        <span>이 사람은 한강지키기운동 회원임을 인증합니다.</span>
-      </div>
-    </div>`;
-}
-
-function fallbackIcon(name) {
-  const el = document.createElement('div');
-  el.className = 'profile-fallback';
-  el.textContent = name ? name[0] : '?';
-  return el;
-}
+  // 카드 상태
+  if (event.state.page === "card") {
+    // 카드 상태는 이미 이전 pushState에서 처리됨
+  }
+};
 </script>
-
-</body>
-</html>
