@@ -6,7 +6,7 @@
 <title>회원 조회 - 한강지키기운동</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
 <style>
-  body { margin: 0; font-family: "Noto Sans KR", sans-serif; background: #e8f5e9; text-align: center; overflow-x: hidden; }
+  body { margin: 0; font-family: "Noto Sans KR", sans-serif; background: #e8f5e9; text-align: center; }
   .centered { display: flex; flex-direction: column; align-items: center; padding-top: clamp(80px, 18vh, 180px); }
   .logo { width: 100px; }
   h1 { font-size: 22px; color: #1b5e20; font-weight: 700; margin-top: 15px; }
@@ -14,97 +14,79 @@
   .search-box { display: flex; justify-content: center; gap: 8px; margin: 15px auto; width: 90%; max-width: 350px; }
   .search-box input { flex: 1; padding: 12px; border-radius: 20px; border: 1px solid #ccc; outline: none; }
   .search-box button { padding: 12px 16px; border-radius: 20px; border: none; background: #2e7d32; color: white; font-weight: 700; cursor: pointer; }
-  
-  /* 카드 떨림 방지를 위해 높이값을 안정적으로 설정 */
   .card { position: relative; width: 90%; max-width: 340px; margin: 20px auto; border-radius: 12px; background: white; padding: 25px 20px; border: 2px solid #2e7d32; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); box-sizing: border-box; }
-  .card::before { content: ""; position: absolute; top: 50%; left: 50%; width: 200px; height: 200px; background: url('https://raw.githubusercontent.com/fafafadola/member-card/main/logo.png') no-repeat center; background-size: contain; opacity: 0.08; transform: translate(-50%, -50%); pointer-events: none; }
-  
-  .profile { width: 140px; height: 140px; border-radius: 10px; margin: 15px 0; object-fit: cover; border: 1px solid #ccc; position: relative; z-index: 2; background: #f9f9f9; }
+  .expired-card { filter: grayscale(100%); opacity: 0.6; }
+  .stamp { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-20deg); border: 4px solid red; color: red; font-size: 32px; font-weight: 700; padding: 10px 20px; background: rgba(255,255,255,0.3); z-index: 10; pointer-events: none; }
+  .profile { width: 140px; height: 140px; border-radius: 10px; margin: 15px 0; object-fit: cover; border: 1px solid #ccc; position: relative; z-index: 2; background: #f0f0f0; }
   .info-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; border-bottom: 1px dashed #eee; padding-bottom: 4px; }
   .info-row b { color: #1b5e20; }
-
-  /* 자막 영역 높이 고정 및 떨림 방지 */
-  .marquee { margin-top: 20px; overflow: hidden; white-space: nowrap; border-top: 1px solid #ddd; padding-top: 10px; height: 25px; position: relative; }
-  .marquee span { display: inline-block; padding-left: 100%; animation: scrollText 15s linear infinite; color: #1b5e20; font-weight: 700; font-size: 13px; position: absolute; left: 0; top: 10px; will-change: transform; }
-  
+  .marquee { margin-top: 20px; overflow: hidden; white-space: nowrap; border-top: 1px solid #ddd; padding-top: 10px; height: 30px; }
+  .marquee span { display: inline-block; padding-left: 100%; animation: scrollText 15s linear infinite; color: #1b5e20; font-weight: 700; font-size: 13px; }
   @keyframes scrollText { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
-  
   .loader { border: 4px solid #eee; border-top: 4px solid #2e7d32; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto; }
   @keyframes spin { 100% { transform: rotate(360deg); } }
-  .fade-in { opacity: 0; transform: translateY(10px); animation: fadeInUp 0.4s ease-out forwards; }
-  @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+  .fade-in { opacity: 0; animation: fadeIn 0.5s forwards; }
+  @keyframes fadeIn { to { opacity: 1; } }
 </style>
 </head>
-
 <body class="centered" oncontextmenu="return false" onselectstart="return false">
-
-  <img src="https://raw.githubusercontent.com/fafafadola/member-card/main/logo.png" class="logo" alt="Logo">
+  <img src="https://raw.githubusercontent.com/fafafadola/member-card/main/logo.png" class="logo">
   <h1>한강지키기운동 남양주지역본부</h1>
   <h3>회원 조회</h3>
-
   <form class="search-box" onsubmit="searchMember(); return false;">
     <input type="text" id="nameInput" placeholder="회원 성명 입력" autocomplete="off">
     <button type="submit">조회하기</button>
   </form>
-
   <div id="result"></div>
 
-  <script>
-    const gasURL = "https://script.google.com/macros/s/AKfycbytBvH-ZM_In4vLtx38OSfnUe7FvDDLwhVFUVawu6DPXcfYeuB_415uhZf5NsXNn-nk/exec";
+<script>
+  const gasURL = "https://script.google.com/macros/s/AKfycbytBvH-ZM_In4vLtx38OSfnUe7FvDDLwhVFUVawu6DPXcfYeuB_415uhZf5NsXNn-nk/exec";
 
-    async function searchMember() {
-      const name = document.getElementById("nameInput").value.trim();
-      const resultDiv = document.getElementById("result");
-      if (!name) { alert("성함을 입력해 주세요."); return; }
+  async function searchMember() {
+    const name = document.getElementById("nameInput").value.trim();
+    if (!name) { alert("성함을 입력해 주세요."); return; }
+    document.body.classList.remove("centered");
+    document.getElementById("result").innerHTML = `<div class="loader"></div>`;
 
-      document.body.classList.remove("centered");
-      resultDiv.innerHTML = `<div class="loader"></div><div style="color:#2e7d32;">정보를 조회 중입니다...</div>`;
+    try {
+      const response = await fetch(`${gasURL}?name=${encodeURIComponent(name)}`);
+      const data = await response.json();
+      if (data.error) { document.getElementById("result").innerHTML = `<p style="color:red; margin-top:20px;">${data.error}</p>`; return; }
+      renderCard(data);
+    } catch (e) { document.getElementById("result").innerHTML = `<p style="color:red;">연결 실패</p>`; }
+  }
 
-      try {
-        const response = await fetch(`${gasURL}?name=${encodeURIComponent(name)}`);
-        const data = await response.json();
-        if (data.error) { resultDiv.innerHTML = `<p style="color:red; margin-top:20px;">⚠️ ${data.error}</p>`; return; }
-        renderCard(data);
-      } catch (error) { resultDiv.innerHTML = `<p style="color:red; margin-top:20px;">❌ 서버 연결 실패</p>`; }
+  function renderCard(m) {
+    const today = new Date(); today.setHours(0,0,0,0);
+    const expiryStr = m.유효기간 || '';
+    let isExpired = false;
+    if (expiryStr) {
+      const p = expiryStr.split('-');
+      const exp = new Date(p[0], p[1]-1, p[2]);
+      if (exp < today) isExpired = true;
     }
 
-    function renderCard(m) {
-      const today = new Date(); today.setHours(0, 0, 0, 0);
-      const expiryDateStr = m.유효기간 || '';
-      let isExpired = false;
+    // 사진 주소 변환 (필수)
+    let pUrl = m.사진URL || '';
+    if (pUrl.includes('id=')) {
+      const id = pUrl.split('id=')[1].split('&')[0];
+      pUrl = `https://docs.google.com/uc?export=view&id=${id}`;
+    }
 
-      if (expiryDateStr) {
-        const parts = expiryDateStr.split('-');
-        if (parts.length === 3) {
-          const expiry = new Date(parts[0], parts[1] - 1, parts[2]);
-          expiry.setHours(0, 0, 0, 0);
-          if (expiry < today) isExpired = true;
-        }
-      }
-
-      let photoUrl = m.사진URL || '';
-      if (photoUrl.includes('drive.google.com')) {
-        const fileId = photoUrl.match(/id=([a-zA-Z0-9_-]+)/) || photoUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-        if (fileId && fileId[1]) { photoUrl = `https://docs.google.com/uc?export=view&id=${fileId[1]}`; }
-      }
-
-      const cardHTML = `
-        <div class="card ${isExpired ? 'expired-card' : ''} fade-in">
-          <h2 style="color:#1b5e20; margin-top:0; margin-bottom:20px; letter-spacing:5px;">회 원 증</h2>
-          <img src="${photoUrl}" class="profile" onerror="this.src='https://via.placeholder.com/140?text=No+Image'">
-          <div style="text-align:left; width:100%; max-width:280px; margin: 0 auto;">
-            <div class="info-row"><b>회원번호</b><span>${m.회원번호 || '-'}</span></div>
-            <div class="info-row"><b>이름</b><span>${m.이름 || '-'}</span></div>
-            <div class="info-row"><b>단체명</b><span>${m.단체명 || '-'}</span></div>
-            <div class="info-row"><b>유효기간</b><span>${expiryDateStr || '기한없음'}</span></div>
-          </div>
-          <div class="marquee">
-            <span>이 사람은 한강지키기운동 회원임을 인증합니다.</span>
-          </div>
+    document.getElementById("result").innerHTML = `
+      <div class="card ${isExpired ? 'expired-card' : ''} fade-in">
+        ${isExpired ? '<div class="stamp">기간만료</div>' : ''}
+        <h2 style="color:#1b5e20; margin-bottom:20px; letter-spacing:5px;">회 원 증</h2>
+        <img src="${pUrl}" class="profile" onerror="this.src='https://via.placeholder.com/140'">
+        <div style="text-align:left; width:260px; margin:0 auto;">
+          <div class="info-row"><b>회원번호</b><span>${m.회원번호}</span></div>
+          <div class="info-row"><b>이름</b><span>${m.이름}</span></div>
+          <div class="info-row"><b>단체명</b><span>${m.단체명}</span></div>
+          <div class="info-row"><b>유효기간</b><span>${expiryStr}</span></div>
         </div>
-      `;
-      document.getElementById("result").innerHTML = cardHTML;
-    }
-  </script>
+        <div class="marquee"><span>이 사람은 한강지키기운동 회원임을 인증합니다.</span></div>
+      </div>`;
+  }
+</script>
 </body>
 </html>
