@@ -1,7 +1,170 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>회원증 조회</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+body {
+  margin: 0;
+  font-family: "Noto Sans KR", sans-serif;
+  background: #e8f5e9;
+  text-align: center;
+}
+
+/* 반응형 위치 */
+.centered {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: clamp(90px, 20vh, 200px);
+}
+
+.logo {
+  width: 100px;
+  margin-top: 15px;
+}
+
+h1 {
+  font-size: 22px;
+  color: #1b5e20;
+  font-weight: 700;
+}
+
+h3 {
+  color: #1b5e20;
+  font-weight: 700;
+}
+
+.search-box {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 15px auto;
+  width: 90%;
+  max-width: 350px;
+}
+
+.search-box input {
+  flex: 1;
+  padding: 12px;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+}
+
+.search-box button {
+  padding: 12px 16px;
+  border-radius: 20px;
+  border: none;
+  background: #2e7d32;
+  color: white;
+  font-weight: 700;
+}
+
+/* 카드 */
+.card {
+  position: relative;
+  width: 90%;
+  max-width: 340px;
+  margin: 20px auto;
+  border-radius: 12px;
+  background: white;
+  padding: 25px 20px;
+  border: 2px solid #2e7d32;
+  overflow: hidden;
+}
+
+/* 워터마크 */
+.card::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200px;
+  height: 200px;
+  background: url('https://raw.githubusercontent.com/fafafadola/member-card/main/logo.png') no-repeat center;
+  background-size: contain;
+  opacity: 0.08;
+  transform: translate(-50%, -50%);
+}
+
+.expired-card {
+  filter: grayscale(100%);
+  opacity: 0.6;
+}
+
+.stamp {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-20deg);
+  border: 4px solid red;
+  color: red;
+  font-size: 32px;
+  font-weight: 700;
+  padding: 10px 20px;
+  background: rgba(255,255,255,0.3);
+}
+
+.profile {
+  width: 140px;
+  height: 140px;
+  border-radius: 10px;
+  margin: 15px 0;
+  object-fit: cover;
+  border: 1px solid #ccc;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.marquee {
+  margin-top: 20px;
+  overflow: hidden;
+  white-space: nowrap;
+  border-top: 1px solid #ddd;
+  padding-top: 10px;
+}
+
+.marquee span {
+  display: inline-block;
+  padding-left: 100%;
+  animation: scrollText 10s linear infinite;
+  color: #1b5e20;
+  font-weight: 700;
+}
+
+@keyframes scrollText {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
+</style>
+</head>
+
+<body class="centered">
+
+<img src="https://raw.githubusercontent.com/fafafadola/member-card/main/logo.png" class="logo">
+
+<h1>한강지키기운동 남양주지역본부</h1>
+<h3>회원 검색</h3>
+
+<form class="search-box" onsubmit="searchMember(); return false;">
+  <input type="text" id="nameInput" placeholder="이름 입력">
+  <button type="submit">검색</button>
+</form>
+
+<div id="result"></div>
+
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbxSEPXfqoFlcxIxsIeYpM9y9t8RIlobXN_9v6B-z-ecOAOh-dWtab_vBWW0-0GwfaWf/exec";
 
-// 🔐 XSS 방지
+// XSS 방지
 function escapeHTML(str) {
   if (!str) return "";
   return String(str).replace(/[&<>"']/g, m => ({
@@ -13,22 +176,25 @@ function escapeHTML(str) {
   }[m]));
 }
 
-// 🔥 날짜 포맷 (YYYY-MM-DD)
+// 날짜 표시용
 function formatDate(dateStr) {
   if (!dateStr) return '';
-
   const d = new Date(dateStr);
   if (isNaN(d.getTime())) return dateStr;
-
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const d2 = String(d.getDate()).padStart(2, '0');
-
-  return `${y}-${m}-${d2}`;
+  return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')}`;
 }
 
-// 🚀 검색 (서버 요청)
+// 날짜 비교용
+function parseDate(dateStr){
+  if(!dateStr) return null;
+  dateStr = String(dateStr).replace(/[.\s]/g,"-");
+  const d = new Date(dateStr);
+  return isNaN(d.getTime()) ? null : d;
+}
+
 async function searchMember() {
+
+  document.body.classList.remove("centered");
 
   const name = document.getElementById("nameInput").value.trim();
   const result = document.getElementById("result");
@@ -49,18 +215,16 @@ async function searchMember() {
       return;
     }
 
-    // 첫 번째 결과 표시
     showCard(data.results[0]);
 
   } catch (e) {
-    result.innerHTML = "오류 발생";
+    result.innerHTML = "서버 오류";
   }
 }
 
-// 🪪 카드 출력 (디자인 유지)
 function showCard(m) {
 
-  const expiry = new Date(m.유효기간);
+  const expiry = parseDate(m.유효기간);
   const isExpired = expiry && expiry < new Date();
 
   document.getElementById("result").innerHTML = `
@@ -81,9 +245,12 @@ function showCard(m) {
       </div>
 
       <div class="marquee">
-        <span>이 회원은 인증된 사용자입니다.</span>
+        <span>이 사람은 한강지키기운동 회원임을 인증합니다.</span>
       </div>
     </div>
   `;
 }
 </script>
+
+</body>
+</html>
