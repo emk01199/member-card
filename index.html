@@ -1,345 +1,108 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>회원증 조회</title>
-
-<!-- 검색엔진 노출 방지 -->
-<meta name="robots" content="noindex, nofollow">
-
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
-
-<style>
-body {
-  margin: 0;
-  font-family: "Noto Sans KR", sans-serif;
-  background: #e8f5e9;
-  text-align: center;
-}
-
-.centered {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-top: clamp(90px, 20vh, 200px);
-}
-
-.logo {
-  width: 100px;
-  margin-top: 15px;
-}
-
-h1 {
-  font-size: 22px;
-  color: #1b5e20;
-  font-weight: 700;
-}
-
-h3 {
-  color: #1b5e20;
-  font-weight: 700;
-}
-
-.search-box {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin: 15px auto;
-  width: 90%;
-  max-width: 350px;
-}
-
-.search-box input {
-  flex: 1;
-  padding: 12px;
-  border-radius: 20px;
-  border: 1px solid #ccc;
-}
-
-.search-box button {
-  padding: 12px 16px;
-  border-radius: 20px;
-  border: none;
-  background: #2e7d32;
-  color: white;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.search-box button:disabled {
-  background: #a5d6a7;
-  cursor: not-allowed;
-}
-
-.card {
-  position: relative;
-  width: 90%;
-  max-width: 340px;
-  margin: 20px auto;
-  border-radius: 12px;
-  background: white;
-  padding: 25px 20px;
-  border: 2px solid #2e7d32;
-  overflow: hidden;
-}
-
-.card::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 200px;
-  height: 200px;
-  background: url('https://raw.githubusercontent.com/fafafadola/member-card/main/logo.png') no-repeat center;
-  background-size: contain;
-  opacity: 0.08;
-  transform: translate(-50%, -50%);
-}
-
-.expired-card {
-  filter: grayscale(100%);
-  opacity: 0.6;
-}
-
-.stamp {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) rotate(-20deg);
-  border: 4px solid red;
-  color: red;
-  font-size: 32px;
-  font-weight: 700;
-  padding: 10px 20px;
-  background: rgba(255,255,255,0.3);
-}
-
-.profile {
-  width: 140px;
-  height: 140px;
-  border-radius: 10px;
-  margin: 15px 0;
-  object-fit: cover;
-  border: 1px solid #ccc;
-}
-
-.profile-fallback {
-  width: 140px;
-  height: 140px;
-  border-radius: 10px;
-  margin: 15px 0;
-  border: 1px solid #ccc;
-  background: #e8f5e9;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 48px;
-  color: #2e7d32;
-}
-
-.info-row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 6px;
-}
-
-.marquee {
-  margin-top: 20px;
-  overflow: hidden;
-  white-space: nowrap;
-  border-top: 1px solid #ddd;
-  padding-top: 10px;
-}
-
-.marquee span {
-  display: inline-block;
-  padding-left: 100%;
-  animation: scrollText 10s linear infinite;
-  color: #1b5e20;
-  font-weight: 700;
-}
-
-@keyframes scrollText {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-100%); }
-}
-
-/* 로딩 스피너 */
-.spinner {
-  display: inline-block;
-  width: 18px;
-  height: 18px;
-  border: 2px solid #fff;
-  border-top-color: transparent;
-  border-radius: 50%;
-  animation: spin 0.6s linear infinite;
-  vertical-align: middle;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-#result {
-  margin-bottom: 40px;
-}
-
-/* 동명이인 선택 버튼 */
-.dup-btn {
-  display: block;
-  margin: 8px auto;
-  padding: 10px 20px;
-  border-radius: 20px;
-  border: 1px solid #2e7d32;
-  background: white;
-  color: #1b5e20;
-  font-weight: 700;
-  font-family: "Noto Sans KR", sans-serif;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.dup-btn:hover {
-  background: #e8f5e9;
-}
-</style>
-</head>
-
-<body class="centered">
-
-<img src="https://raw.githubusercontent.com/fafafadola/member-card/main/logo.png" class="logo" alt="로고">
-
-<h1>한강지키기운동 남양주지역본부</h1>
-<h3>회원 검색</h3>
-
-<form class="search-box" onsubmit="searchMember(); return false;">
-  <input type="text" id="nameInput" placeholder="이름 입력" maxlength="10" autocomplete="off">
-  <button type="submit" id="searchBtn">검색</button>
-</form>
-
-<div id="result"></div>
-
 <script>
-// ✅ 여기에 Apps Script 배포 URL 입력
-const API_URL = 'https://script.google.com/macros/s/AKfycbxRR4if_-2Sqqjn_Khn6Ywd2EGgOD0zVaUw8mLWErNrEgwHViC9ug8fZO0LKX8fXNGX/exec';
+const sheetURL = "https://opensheet.elk.sh/1cxyCAgTDUbpvqTPVq3ZOqZQkw6lBGztqGWDjx7dyp7E/회원DB";
 
-// ── 상태 변수 ──────────────────────────────────
-let lastSearch  = 0;
-let isSearching = false;
+let members = [];
+let lastSearch = 0;
 
-// ── XSS 방지 ──────────────────────────────────
+// 데이터 로딩
+fetch(sheetURL)
+  .then(res => res.json())
+  .then(data => {
+    members = data;
+  });
+
+// 🔐 XSS 방지
 function escapeHTML(str) {
-  if (!str) return '';
+  if (!str) return "";
   return String(str).replace(/[&<>"']/g, m => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#39;'
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#39;'
   }[m]));
 }
 
-// ── 검색 ──────────────────────────────────────
-function searchMember() {
-  const now = Date.now();
-  if (isSearching)          return;
-  if (now - lastSearch < 1500) return;
+// 🔥 날짜 포맷 (핵심 추가)
+function formatDate(dateStr) {
+  if (!dateStr) return '';
 
-  const name   = document.getElementById('nameInput').value.trim();
-  const result = document.getElementById('result');
-  const btn    = document.getElementById('searchBtn');
+  const d = new Date(dateStr);
+
+  if (isNaN(d.getTime())) return dateStr;
+
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+}
+
+// 검색
+function searchMember() {
+
+  const now = Date.now();
+  if (now - lastSearch < 1500) return;
+  lastSearch = now;
+
+  const name = document.getElementById("nameInput").value.trim();
+  const result = document.getElementById("result");
 
   if (!name) {
-    result.innerHTML = '<p>이름을 입력하세요</p>';
+    result.innerHTML = "이름을 입력하세요";
     return;
   }
+
   if (name.length < 2) {
-    result.innerHTML = '<p>2글자 이상 입력하세요</p>';
+    result.innerHTML = "2글자 이상 입력하세요";
     return;
   }
 
-  // 로딩 상태
-  isSearching  = true;
-  lastSearch   = now;
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>';
-  result.innerHTML = '';
+  const filtered = members.filter(m => m.이름 === name);
 
-  const url = API_URL + '?name=' + encodeURIComponent(name);
+  if (filtered.length === 0) {
+    result.innerHTML = "검색 결과 없음";
+    return;
+  }
 
-  fetch(url)
-    .then(res => {
-      if (!res.ok) throw new Error('네트워크 오류');
-      return res.json();
-    })
-    .then(data => {
-      if (data.error) {
-        result.innerHTML = '<p>' + escapeHTML(data.error) + '</p>';
-        return;
-      }
-      if (!data.results || data.results.length === 0) {
-        result.innerHTML = '<p>검색 결과 없음</p>';
-        return;
-      }
-      if (data.results.length > 1) {
-        showDuplicatePicker(data.results);
-      } else {
-        showCard(data.results[0]);
-      }
-    })
-    .catch(() => {
-      result.innerHTML = '<p>오류가 발생했습니다. 잠시 후 다시 시도해주세요.</p>';
-    })
-    .finally(() => {
-      isSearching  = false;
-      btn.disabled = false;
-      btn.innerHTML = '검색';
+  if (filtered.length > 1) {
+    let html = "<h4>동명이인 선택</h4>";
+    filtered.forEach((m,i)=>{
+      html += `<button onclick="showCard(${i}, this.dataset.name)">
+        ${escapeHTML(m.이름)} (${escapeHTML(m.회원번호)})
+      </button><br>`;
     });
+    document.getElementById("result").innerHTML = html;
+  } else {
+    showCard(0, filtered);
+  }
 }
 
-// ── 동명이인 선택 ──────────────────────────────
-function showDuplicatePicker(members) {
-  const result = document.getElementById('result');
-  let html = '<h4>동명이인 — 선택하세요</h4>';
-  members.forEach((m, i) => {
-    // 버튼 클릭 시 index로 접근 (클로저 문제 방지)
-    html += `<button class="dup-btn" onclick="showCardByIndex(${i})">${escapeHTML(m['이름'])} (${escapeHTML(m['회원번호'])})</button>`;
-  });
-  result.innerHTML = html;
+// 카드 출력
+function showCard(index, list){
 
-  // 선택용 임시 저장 (전역 노출 최소화)
-  result._members = members;
-}
+  const m = list ? list[index] : members.find(x => x.이름 === document.getElementById("nameInput").value);
 
-function showCardByIndex(i) {
-  const members = document.getElementById('result')._members;
-  if (members && members[i]) showCard(members[i]);
-}
+  const expiry = new Date(m.유효기간);
+  const isExpired = expiry && expiry < new Date();
 
-// ── 카드 렌더링 ────────────────────────────────
-function showCard(m) {
-  const result   = document.getElementById('result');
-  const expiry   = new Date(m['유효기간']);
-  const isExpired = !isNaN(expiry) && expiry < new Date();
-
-  // 프로필 이미지: URL이 있으면 img, 없으면 이니셜 아이콘
-  const photoHTML = m['사진URL']
-    ? `<img src="${escapeHTML(m['사진URL'])}" class="profile" alt="프로필" onerror="this.parentNode.replaceChild(fallbackIcon('${escapeHTML(m['이름'])}'), this)">`
-    : fallbackIconHTML(m['이름']);
-
-  result.innerHTML = `
-    <div class="card${isExpired ? ' expired-card' : ''}">
-      ${isExpired ? '<div class="stamp">사용불가</div>' : ''}
+  document.getElementById("result").innerHTML = `
+    <div class="card ${isExpired ? 'expired-card' : ''}">
+      ${isExpired ? `<div class="stamp">사용불가</div>` : ""}
 
       <h2>회원증</h2>
 
-      ${photoHTML}
+      <img src="${escapeHTML(m.사진URL)}" class="profile">
 
-      <div class="info-row"><span>회원번호</span><span>${escapeHTML(m['회원번호'])}</span></div>
-      <div class="info-row"><span>이름</span><span>${escapeHTML(m['이름'])}</span></div>
-      <div class="info-row"><span>단체명</span><span>${escapeHTML(m['단체명'])}</span></div>
-      <div class="info-row"><span>유효기간</span><span>${escapeHTML(m['유효기간'])}</span></div>
+      <div class="info-row"><span>회원번호</span><span>${escapeHTML(m.회원번호)}</span></div>
+      <div class="info-row"><span>이름</span><span>${escapeHTML(m.이름)}</span></div>
+      <div class="info-row"><span>단체명</span><span>${escapeHTML(m.단체명)}</span></div>
+
+      <!-- 🔥 여기 유효기간 수정됨 -->
+      <div class="info-row">
+        <span>유효기간</span>
+        <span>${formatDate(m.유효기간)}</span>
+      </div>
 
       <div class="marquee">
         <span>이 회원은 인증된 사용자입니다.</span>
@@ -347,20 +110,4 @@ function showCard(m) {
     </div>
   `;
 }
-
-// 이미지 로드 실패 시 대체 아이콘 반환 (onerror용)
-function fallbackIcon(name) {
-  const el = document.createElement('div');
-  el.className = 'profile-fallback';
-  el.textContent = name ? name[0] : '?';
-  return el;
-}
-
-function fallbackIconHTML(name) {
-  const initial = escapeHTML(name ? name[0] : '?');
-  return `<div class="profile-fallback">${initial}</div>`;
-}
 </script>
-
-</body>
-</html>
