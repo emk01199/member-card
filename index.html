@@ -15,35 +15,20 @@ body {
   text-align: center;
 }
 
-/* 🔥 반응형 위치 */
+/* 반응형 중앙 */
 .centered {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: clamp(90px, 20vh, 200px);
+  padding-top: clamp(80px, 18vh, 180px);
 }
 
+/* 로고 */
 .logo {
   width: 100px;
-  margin-top: 15px;
 }
 
-.back-btn {
-  position: fixed;
-  top: 15px;
-  left: 15px;
-  font-size: 24px;
-  background: white;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  line-height: 40px;
-  text-align: center;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  cursor: pointer;
-  display: none;
-}
-
+/* 제목 */
 h1 {
   font-size: 22px;
   color: #1b5e20;
@@ -55,6 +40,7 @@ h3 {
   font-weight: 700;
 }
 
+/* 검색창 */
 .search-box {
   display: flex;
   justify-content: center;
@@ -78,8 +64,10 @@ h3 {
   background: #2e7d32;
   color: white;
   font-weight: 700;
+  cursor: pointer;
 }
 
+/* 카드 */
 .card {
   position: relative;
   width: 90%;
@@ -92,6 +80,7 @@ h3 {
   overflow: hidden;
 }
 
+/* 워터마크 */
 .card::before {
   content: "";
   position: absolute;
@@ -105,11 +94,13 @@ h3 {
   transform: translate(-50%, -50%);
 }
 
+/* 만료 */
 .expired-card {
   filter: grayscale(100%);
   opacity: 0.6;
 }
 
+/* 도장 */
 .stamp {
   position: absolute;
   top: 50%;
@@ -123,6 +114,7 @@ h3 {
   background: rgba(255,255,255,0.3);
 }
 
+/* 사진 */
 .profile {
   width: 140px;
   height: 140px;
@@ -132,12 +124,14 @@ h3 {
   border: 1px solid #ccc;
 }
 
+/* 정보 */
 .info-row {
   display: flex;
   justify-content: space-between;
   margin-bottom: 6px;
 }
 
+/* 흐르는 문구 */
 .marquee {
   margin-top: 20px;
   overflow: hidden;
@@ -158,12 +152,39 @@ h3 {
   0% { transform: translateX(0); }
   100% { transform: translateX(-100%); }
 }
+
+/* 로딩 스피너 */
+.loader {
+  border: 4px solid #eee;
+  border-top: 4px solid #2e7d32;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 1s linear infinite;
+  margin: 20px auto;
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+/* 카드 등장 애니메이션 */
+.fade-in {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.5s ease forwards;
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 </style>
 </head>
 
 <body class="centered">
-
-<div class="back-btn" onclick="goBack()">←</div>
 
 <img src="https://raw.githubusercontent.com/fafafadola/member-card/main/logo.png" class="logo">
 
@@ -181,77 +202,88 @@ h3 {
 const sheetURL = "https://opensheet.elk.sh/1cxyCAgTDUbpvqTPVq3ZOqZQkw6lBGztqGWDjx7dyp7E/회원DB";
 
 let members = [];
-let currentFiltered = [];
 
 fetch(sheetURL)
 .then(res => res.json())
-.then(data => members = data)
-.catch(err => {
-  document.getElementById("result").innerHTML = "데이터 불러오기 실패";
-});
+.then(data => members = data.filter(m => m.이름));
+
+function escapeHTML(str) {
+  if (!str) return "";
+  return String(str).replace(/[&<>"']/g, m => ({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#39;'
+  }[m]));
+}
+
+function parseDate(dateStr){
+  if(!dateStr) return null;
+  dateStr = String(dateStr).replace(/[.\s]/g,"-");
+  const d = new Date(dateStr);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return dateStr;
+  return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')}`;
+}
 
 function searchMember() {
+
   document.body.classList.remove("centered");
 
   const name = document.getElementById("nameInput").value.trim();
   const result = document.getElementById("result");
 
-  const filtered = members.filter(m => m.이름 && m.이름.includes(name));
-  currentFiltered = filtered;
-
-  if (filtered.length === 0) {
-    result.innerHTML = "검색 결과 없음";
+  if (!name) {
+    result.innerHTML = "이름을 입력하세요";
     return;
   }
 
-  if (filtered.length > 1) {
-    showList(filtered);
-    history.pushState({ page: "list" }, "", "");
-  } else {
-    showSingle(filtered[0]);
-  }
+  result.innerHTML = `
+    <div class="loader"></div>
+    <div>검색중...</div>
+  `;
+
+  setTimeout(() => {
+
+    const filtered = members.filter(m => m.이름 && m.이름.includes(name));
+
+    if (filtered.length === 0) {
+      result.innerHTML = "검색 결과 없음";
+      return;
+    }
+
+    showCard(filtered[0]);
+
+  }, 300);
 }
 
-function showList(filtered){
-  document.querySelector(".back-btn").style.display = "block";
-
-  let html = "<h4>동명이인 선택</h4>";
-  filtered.forEach((m,i)=>{
-    html += `<button onclick="selectMember(${i})">${m.이름} (${m.회원번호})</button><br>`;
-  });
-
-  document.getElementById("result").innerHTML = html;
-}
-
-function selectMember(i){
-  showSingle(currentFiltered[i]);
-}
-
-function parseDate(dateStr){
-  if(!dateStr) return null;
-  dateStr = dateStr.replace(/[.\//년월일]/g, "-");
-  return new Date(dateStr);
-}
-
-function showSingle(m){
-  history.pushState({ page: "card" }, "", "");
+function showCard(m) {
 
   const expiry = parseDate(m.유효기간);
   const isExpired = expiry && expiry < new Date();
 
-  document.querySelector(".back-btn").style.display = "block";
-
   document.getElementById("result").innerHTML = `
-    <div class="card ${isExpired ? 'expired-card' : ''}">
+    <div class="card ${isExpired ? 'expired-card' : ''} fade-in">
       ${isExpired ? `<div class="stamp">사용불가</div>` : ""}
 
       <h2>회원증</h2>
-      <img src="${m.사진URL}" class="profile">
 
-      <div class="info-row"><span>회원번호</span><span>${m.회원번호}</span></div>
-      <div class="info-row"><span>이름</span><span>${m.이름}</span></div>
-      <div class="info-row"><span>단체명</span><span>${m.단체명}</span></div>
-      <div class="info-row"><span>유효기간</span><span>${m.유효기간}</span></div>
+      <img src="${escapeHTML(m.사진URL)}" class="profile">
+
+      <div class="info-row"><span>회원번호</span><span>${escapeHTML(m.회원번호)}</span></div>
+      <div class="info-row"><span>이름</span><span>${escapeHTML(m.이름)}</span></div>
+      <div class="info-row"><span>단체명</span><span>${escapeHTML(m.단체명)}</span></div>
+
+      <div class="info-row">
+        <span>유효기간</span>
+        <span>${formatDate(m.유효기간)}</span>
+      </div>
 
       <div class="marquee">
         <span>이 사람은 한강지키기운동 회원임을 인증합니다.</span>
@@ -259,23 +291,6 @@ function showSingle(m){
     </div>
   `;
 }
-
-function goBack(){
-  history.back();
-}
-
-window.onpopstate = function(event) {
-  if (!event.state) {
-    document.getElementById("result").innerHTML = "";
-    document.querySelector(".back-btn").style.display = "none";
-    document.body.classList.add("centered");
-    return;
-  }
-
-  if (event.state.page === "list") {
-    showList(currentFiltered);
-  }
-};
 </script>
 
 </body>
