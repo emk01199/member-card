@@ -18,7 +18,7 @@
   .card { position: relative; width: 90%; max-width: 340px; margin: 20px auto; border-radius: 12px; background: white; padding: 25px 20px; border: 2px solid #2e7d32; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
   .card::before { content: ""; position: absolute; top: 50%; left: 50%; width: 200px; height: 200px; background: url('https://raw.githubusercontent.com/fafafadola/member-card/main/logo.png') no-repeat center; background-size: contain; opacity: 0.08; transform: translate(-50%, -50%); pointer-events: none; }
   .expired-card { filter: grayscale(100%); opacity: 0.6; }
-  .stamp { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-20deg); border: 4px solid red; color: red; font-size: 32px; font-weight: 700; padding: 10px 20px; background: rgba(255,255,255,0.3); z-index: 10; pointer-events: none; }
+  .stamp { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50) rotate(-20deg); border: 4px solid red; color: red; font-size: 32px; font-weight: 700; padding: 10px 20px; background: rgba(255,255,255,0.3); z-index: 10; pointer-events: none; }
   .profile { width: 140px; height: 140px; border-radius: 10px; margin: 15px 0; object-fit: cover; border: 1px solid #ccc; position: relative; z-index: 2; background: #f0f0f0; }
   .info-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; border-bottom: 1px dashed #eee; padding-bottom: 4px; }
   .info-row b { color: #1b5e20; }
@@ -37,9 +37,7 @@
 
   <img src="https://raw.githubusercontent.com/fafafadola/member-card/main/logo.png" class="logo" alt="Logo">
   <h1>한강지키기운동 남양주지역본부</h1>
-  <h3>회원증 실시간 조회</h3>
-
-  <form class="search-box" onsubmit="searchMember(); return false;">
+  <h3>회원 조회</h3> <form class="search-box" onsubmit="searchMember(); return false;">
     <input type="text" id="nameInput" placeholder="회원 성명 입력" autocomplete="off">
     <button type="submit">조회하기</button>
   </form>
@@ -47,7 +45,6 @@
   <div id="result"></div>
 
   <script>
-    // 유저님이 제공해주신 GAS 웹 앱 URL 적용 완료
     const gasURL = "https://script.google.com/macros/s/AKfycbytBvH-ZM_In4vLtx38OSfnUe7FvDDLwhVFUVawu6DPXcfYeuB_415uhZf5NsXNn-nk/exec";
 
     async function searchMember() {
@@ -61,15 +58,13 @@
         return;
       }
 
-      // 화면 레이아웃 조정 및 로딩 표시
       document.body.classList.remove("centered");
       resultDiv.innerHTML = `
         <div class="loader"></div>
-        <div style="color:#2e7d32;">서버에서 정보를 가져오는 중입니다...</div>
+        <div style="color:#2e7d32;">회원 정보를 불러오는 중입니다...</div>
       `;
 
       try {
-        // GAS 웹 앱 호출
         const response = await fetch(`${gasURL}?name=${encodeURIComponent(name)}`);
         const data = await response.json();
 
@@ -87,8 +82,9 @@
 
     function renderCard(m) {
       const today = new Date();
-      // 유효기간 데이터가 있을 경우 날짜 객체로 변환
-      const expiry = m.유효기간 ? new Date(m.유효기간) : null;
+      // 유효기간 형식 강제 적용 (YYYY-MM-DD)
+      const expiryDateStr = m.유효기간 || '';
+      const expiry = expiryDateStr ? new Date(expiryDateStr) : null;
       const isExpired = expiry && expiry < today;
 
       const cardHTML = `
@@ -104,7 +100,7 @@
             <div class="info-row"><b>회원번호</b><span>${m.회원번호 || '-'}</span></div>
             <div class="info-row"><b>이름</b><span>${m.이름 || '-'}</span></div>
             <div class="info-row"><b>단체명</b><span>${m.단체명 || '-'}</span></div>
-            <div class="info-row"><b>유효기간</b><span>${m.유효기간 || '기한없음'}</span></div>
+            <div class="info-row"><b>유효기간</b><span>${expiryDateStr || '기한없음'}</span></div>
           </div>
 
           <div class="marquee">
