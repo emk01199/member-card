@@ -55,7 +55,7 @@ h3 {
   outline: none;
 }
 
-/* 버튼만 수정 */
+/* ✅ 버튼 디자인만 변경 */
 .search-box button {
   padding: 12px 18px;
   border-radius: 20px;
@@ -64,8 +64,7 @@ h3 {
   color: white;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.25s ease;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  transition: all 0.2s ease;
 }
 
 .search-box button:hover {
@@ -76,6 +75,7 @@ h3 {
   transform: scale(0.96);
 }
 
+/* ===== 원본 카드 ===== */
 .card {
   position: relative;
   width: 90%;
@@ -130,6 +130,8 @@ h3 {
   margin: 15px 0;
   object-fit: cover;
   border: 1px solid #ccc;
+  position: relative;
+  z-index: 2;
   background: #f0f0f0;
 }
 
@@ -142,9 +144,7 @@ h3 {
   padding-bottom: 4px;
 }
 
-.info-row b {
-  color: #1b5e20;
-}
+.info-row b { color: #1b5e20; }
 
 .marquee {
   margin-top: 20px;
@@ -197,17 +197,54 @@ h3 {
   margin-top: 20px;
   font-weight: 700;
 }
+
+/* ===== ✅ 안전 디자인 덮어쓰기 ===== */
+.card {
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+
+.card::before {
+  opacity: 0.06;
+}
+
+.card h2 {
+  letter-spacing: 6px !important;
+}
+
+.card .info-row {
+  border-bottom: 1px dashed #c8e6c9 !important;
+  padding-bottom: 6px;
+  margin-bottom: 10px;
+}
+
+.card .info-row b {
+  color: #2e7d32 !important;
+}
+
+.card .info-row span {
+  color: #333;
+}
+
+.card .profile {
+  border-radius: 12px;
+  border: 1px solid #ddd;
+}
+
+.card .stamp {
+  opacity: 0.85;
+}
 </style>
 </head>
 
-<body class="centered">
+<body class="centered" oncontextmenu="return false" onselectstart="return false">
 
 <img src="https://raw.githubusercontent.com/fafafadola/member-card/main/logo.png" class="logo">
 <h1>한강지키기운동 남양주지역본부</h1>
 <h3>회원 조회</h3>
 
 <form class="search-box" onsubmit="searchMember(); return false;">
-  <input type="text" id="nameInput" placeholder="회원 성명 입력">
+  <input type="text" id="nameInput" placeholder="회원 성명 입력" autocomplete="off">
   <button type="submit">조회하기</button>
 </form>
 
@@ -217,11 +254,13 @@ h3 {
 const gasURL = "https://script.google.com/macros/s/AKfycbytBvH-ZM_In4vLtx38OSfnUe7FvDDLwhVFUVawu6DPXcfYeuB_415uhZf5NsXNn-nk/exec";
 
 async function searchMember() {
-  const name = document.getElementById("nameInput").value.trim();
+  const nameInput = document.getElementById("nameInput");
+  const name = nameInput.value.trim();
   const resultDiv = document.getElementById("result");
 
   if (!name) {
     alert("성함을 입력해 주세요.");
+    nameInput.focus();
     return;
   }
 
@@ -240,9 +279,7 @@ async function searchMember() {
       return;
     }
 
-    /* 🔥 핵심 수정 */
-    renderCard(data.data || data);
-
+    renderCard(data);
   } catch (error) {
     resultDiv.innerHTML = `<p class="error-msg">❌ 서버 오류</p>`;
   }
@@ -254,22 +291,27 @@ function renderCard(m) {
   const isExpired = expiry && expiry < today;
 
   const cardHTML = `
-    <div class="card ${isExpired ? 'expired-card' : ''}">
+    <div class="card ${isExpired ? 'expired-card' : ''} fade-in">
       ${isExpired ? `<div class="stamp">기간만료</div>` : ""}
 
-      <h2 style="letter-spacing:6px;">회 원 증</h2>
+      <h2 style="color:#1b5e20; margin-top:0; margin-bottom:20px; letter-spacing:5px;">회 원 증</h2>
 
-      <img src="${m.사진URL || ''}" class="profile">
+      <img src="${m.사진URL || 'https://via.placeholder.com/140?text=No+Image'}"
+           class="profile"
+           onerror="this.src='https://via.placeholder.com/140?text=No+Image'">
 
       <div style="text-align:left; width:100%; max-width:280px; margin: 0 auto;">
         <div class="info-row"><b>회원번호</b><span>${m.회원번호 || '-'}</span></div>
         <div class="info-row"><b>이름</b><span>${m.이름 || '-'}</span></div>
         <div class="info-row"><b>단체명</b><span>${m.단체명 || '-'}</span></div>
-        <div class="info-row"><b>유효기간</b><span>${m.유효기간 || '-'}</span></div>
+        <div class="info-row"><b>유효기간</b><span>${m.유효기간 || '기한없음'}</span></div>
+      </div>
+
+      <div class="marquee">
+        <span>한강지키기운동 남양주지역본부 회원임을 인증합니다.</span>
       </div>
     </div>
   `;
-
   document.getElementById("result").innerHTML = cardHTML;
 }
 </script>
