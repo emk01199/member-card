@@ -55,7 +55,7 @@ h3 {
   outline: none;
 }
 
-/* ✅ 버튼 디자인만 변경 */
+/* ✅ 버튼만 디자인 변경 */
 .search-box button {
   padding: 12px 18px;
   border-radius: 20px;
@@ -136,31 +136,17 @@ h3 {
   background: #f0f0f0;
 }
 
-/* ✅ 회원증 텍스트 디자인만 변경 */
-.card h2 {
-  color: #1b5e20;
-  letter-spacing: 6px;
-  font-weight: 700;
-  margin-bottom: 20px;
-}
-
 .info-row {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   font-size: 14px;
-  border-bottom: 1px dashed #c8e6c9;
-  padding-bottom: 6px;
+  border-bottom: 1px dashed #eee;
+  padding-bottom: 4px;
 }
 
 .info-row b {
-  color: #2e7d32;
-  font-weight: 700;
-}
-
-.info-row span {
-  color: #333;
-  font-weight: 500;
+  color: #1b5e20;
 }
 
 .marquee {
@@ -247,7 +233,7 @@ h3 {
       document.body.classList.remove("centered");
       resultDiv.innerHTML = `
         <div class="loader"></div>
-        <div style="color:#2e7d32;">서버에서 정보를 가져오는 중입니다...</div>
+        <div style="color:#2e7d32;">검색중...</div>
       `;
 
       try {
@@ -274,7 +260,7 @@ h3 {
       const cardHTML = `
         <div class="card ${isExpired ? 'expired-card' : ''} fade-in">
           ${isExpired ? `<div class="stamp">기간만료</div>` : ""}
-          <h2>회 원 증</h2>
+          <h2 style="color:#1b5e20; letter-spacing:6px; margin-bottom:20px;">회 원 증</h2>
 
           <img src="${m.사진URL || 'https://via.placeholder.com/140?text=No+Image'}" 
                class="profile" 
