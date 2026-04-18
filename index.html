@@ -11,10 +11,11 @@
 body {
   margin: 0;
   font-family: "Noto Sans KR", sans-serif;
-  background: #eef4fb;
+  background: #e3f2fd;
   text-align: center;
 }
 
+/* 반응형 중앙 */
 .centered {
   display: flex;
   flex-direction: column;
@@ -22,21 +23,24 @@ body {
   padding-top: clamp(80px, 18vh, 180px);
 }
 
+/* 로고 */
 .logo {
   width: 100px;
 }
 
+/* 제목 */
 h1 {
   font-size: 22px;
-  color: #003e8f;
+  color: #0d47a1;
   font-weight: 700;
 }
 
 h3 {
-  color: #003e8f;
+  color: #0d47a1;
   font-weight: 700;
 }
 
+/* 검색창 */
 .search-box {
   display: flex;
   justify-content: center;
@@ -57,12 +61,13 @@ h3 {
   padding: 12px 16px;
   border-radius: 20px;
   border: none;
-  background: #1a5fb4;
+  background: #1565c0;
   color: white;
   font-weight: 700;
   cursor: pointer;
 }
 
+/* 카드 */
 .card {
   position: relative;
   width: 90%;
@@ -71,10 +76,11 @@ h3 {
   border-radius: 12px;
   background: white;
   padding: 25px 20px;
-  border: 2px solid #1a5fb4;
+  border: 2px solid #1565c0;
   overflow: hidden;
 }
 
+/* 워터마크 */
 .card::before {
   content: "";
   position: absolute;
@@ -88,11 +94,13 @@ h3 {
   transform: translate(-50%, -50%);
 }
 
+/* 만료 */
 .expired-card {
   filter: grayscale(100%);
   opacity: 0.6;
 }
 
+/* 도장 */
 .stamp {
   position: absolute;
   top: 50%;
@@ -106,6 +114,7 @@ h3 {
   background: rgba(255,255,255,0.3);
 }
 
+/* 사진 */
 .profile {
   width: 140px;
   height: 140px;
@@ -115,12 +124,14 @@ h3 {
   border: 1px solid #ccc;
 }
 
+/* 정보 (원래 간격 유지) */
 .info-row {
   display: flex;
   justify-content: space-between;
   margin-bottom: 6px;
 }
 
+/* 흐르는 문구 */
 .marquee {
   margin-top: 20px;
   overflow: hidden;
@@ -133,7 +144,7 @@ h3 {
   display: inline-block;
   padding-left: 100%;
   animation: scrollText 10s linear infinite;
-  color: #003e8f;
+  color: #0d47a1;
   font-weight: 700;
 }
 
@@ -142,9 +153,10 @@ h3 {
   100% { transform: translateX(-100%); }
 }
 
+/* 로딩 스피너 */
 .loader {
   border: 4px solid #eee;
-  border-top: 4px solid #1a5fb4;
+  border-top: 4px solid #1565c0;
   border-radius: 50%;
   width: 30px;
   height: 30px;
@@ -156,6 +168,7 @@ h3 {
   100% { transform: rotate(360deg); }
 }
 
+/* 카드 등장 애니메이션 */
 .fade-in {
   opacity: 0;
   transform: translateY(20px);
@@ -232,6 +245,7 @@ function searchMember() {
   `;
 
   setTimeout(() => {
+
     const filtered = members.filter(m =>
       m.이름 && m.이름.replace(/\s/g,'') === name.replace(/\s/g,'')
     );
