@@ -1,297 +1,287 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>회원증 조회</title>
+<!DOCTYPE html> 
+<html lang="ko"> 
+<head> 
+<meta charset="UTF-8"> 
+<meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+<title>회원증 조회</title> 
 
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet"> 
 
-<style>
-body {
-  margin: 0;
-  font-family: "Noto Sans KR", sans-serif;
-  background: #e8f5e9;
-  text-align: center;
-}
+<style> 
+body { 
+  margin: 0; 
+  font-family: "Noto Sans KR", sans-serif; 
+  background: #e8f5e9; 
+  text-align: center; 
+} 
 
-/* 반응형 중앙 */
-.centered {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-top: clamp(80px, 18vh, 180px);
-}
+.centered { 
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+  padding-top: clamp(80px, 18vh, 180px); 
+} 
 
-/* 로고 */
-.logo {
-  width: 100px;
-}
+.logo { width: 100px; } 
 
-/* 제목 */
-h1 {
-  font-size: 22px;
-  color: #1b5e20;
-  font-weight: 700;
-}
+h1 { 
+  font-size: 22px; 
+  color: #1b5e20; 
+  font-weight: 700; 
+} 
 
-h3 {
-  color: #1b5e20;
-  font-weight: 700;
-}
+h3 { 
+  color: #1b5e20; 
+  font-weight: 700; 
+} 
 
-/* 검색창 */
-.search-box {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin: 15px auto;
-  width: 90%;
-  max-width: 350px;
-}
+.search-box { 
+  display: flex; 
+  justify-content: center; 
+  gap: 8px; 
+  margin: 15px auto; 
+  width: 90%; 
+  max-width: 350px; 
+} 
 
-.search-box input {
-  flex: 1;
-  padding: 12px;
-  border-radius: 20px;
-  border: 1px solid #ccc;
-}
+.search-box input { 
+  flex: 1; 
+  padding: 12px; 
+  border-radius: 20px; 
+  border: 1px solid #ccc; 
+} 
 
-.search-box button {
-  padding: 12px 16px;
-  border-radius: 20px;
-  border: none;
-  background: #2e7d32;
-  color: white;
-  font-weight: 700;
-  cursor: pointer;
-}
+.search-box button { 
+  padding: 12px 16px; 
+  border-radius: 20px; 
+  border: none; 
+  background: #2e7d32; 
+  color: white; 
+  font-weight: 700; 
+  cursor: pointer; 
+} 
 
 /* 카드 */
-.card {
-  position: relative;
-  width: 90%;
-  max-width: 340px;
-  margin: 20px auto;
-  border-radius: 12px;
-  background: white;
-  padding: 25px 20px;
-  border: 2px solid #2e7d32;
-  overflow: hidden;
-}
+.card { 
+  position: relative; 
+  width: 90%; 
+  max-width: 340px; 
+  margin: 20px auto; 
+  border-radius: 12px; 
+  background: white; 
+  padding: 25px 20px; 
+  border: 2px solid #2e7d32; 
+  overflow: hidden; 
+  color: #333; /* 추가 */
+} 
 
-/* 워터마크 */
-.card::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 200px;
-  height: 200px;
-  background: url('https://raw.githubusercontent.com/fafafadola/member-card/main/logo.png') no-repeat center;
-  background-size: contain;
-  opacity: 0.08;
-  transform: translate(-50%, -50%);
-}
+.card::before { 
+  content: ""; 
+  position: absolute; 
+  top: 50%; 
+  left: 50%; 
+  width: 200px; 
+  height: 200px; 
+  background: url('https://raw.githubusercontent.com/fafafadola/member-card/main/logo.png') no-repeat center; 
+  background-size: contain; 
+  opacity: 0.08; 
+  transform: translate(-50%, -50%); 
+} 
 
-/* 만료 */
-.expired-card {
-  filter: grayscale(100%);
-  opacity: 0.6;
-}
+.expired-card { 
+  filter: grayscale(100%); 
+  opacity: 0.6; 
+} 
 
-/* 도장 */
-.stamp {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) rotate(-20deg);
-  border: 4px solid red;
-  color: red;
-  font-size: 32px;
-  font-weight: 700;
-  padding: 10px 20px;
-  background: rgba(255,255,255,0.3);
-}
+.stamp { 
+  position: absolute; 
+  top: 50%; 
+  left: 50%; 
+  transform: translate(-50%, -50%) rotate(-20deg); 
+  border: 4px solid red; 
+  color: red; 
+  font-size: 32px; 
+  font-weight: 700; 
+  padding: 10px 20px; 
+  background: rgba(255,255,255,0.3); 
+} 
 
-/* 사진 */
-.profile {
-  width: 140px;
-  height: 140px;
-  border-radius: 10px;
-  margin: 15px 0;
-  object-fit: cover;
-  border: 1px solid #ccc;
-}
+.profile { 
+  width: 140px; 
+  height: 140px; 
+  border-radius: 10px; 
+  margin: 15px 0; 
+  object-fit: cover; 
+  border: 1px solid #ccc; 
+} 
 
-/* 정보 */
-.info-row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 6px;
-}
+/* 정보 디자인 개선 */
+.info-row { 
+  display: flex; 
+  justify-content: space-between; 
+  margin-bottom: 10px; /* 변경 */
+  font-size: 14px; /* 추가 */
+  border-bottom: 1px dashed #eee; /* 추가 */
+  padding-bottom: 6px; /* 추가 */
+} 
 
-/* 흐르는 문구 */
-.marquee {
-  margin-top: 20px;
-  overflow: hidden;
-  white-space: nowrap;
-  border-top: 1px solid #ddd;
-  padding-top: 10px;
-}
-
-.marquee span {
-  display: inline-block;
-  padding-left: 100%;
-  animation: scrollText 10s linear infinite;
-  color: #1b5e20;
+.info-row span:first-child {
+  color: #2e7d32; /* 라벨 색 */
   font-weight: 700;
 }
 
-@keyframes scrollText {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-100%); }
+/* 회원증 제목 */
+h2 {
+  color:#1b5e20;
+  margin-top:0;
+  margin-bottom:18px;
+  letter-spacing:2px; /* 핵심 수정 */
 }
 
-/* 로딩 스피너 */
-.loader {
-  border: 4px solid #eee;
-  border-top: 4px solid #2e7d32;
-  border-radius: 50%;
-  width: 30px;
-  height: 30px;
-  animation: spin 1s linear infinite;
-  margin: 20px auto;
-}
+.marquee { 
+  margin-top: 20px; 
+  overflow: hidden; 
+  white-space: nowrap; 
+  border-top: 1px solid #ddd; 
+  padding-top: 10px; 
+} 
 
-@keyframes spin {
-  100% { transform: rotate(360deg); }
-}
+.marquee span { 
+  display: inline-block; 
+  padding-left: 100%; 
+  animation: scrollText 10s linear infinite; 
+  color: #1b5e20; 
+  font-weight: 700; 
+} 
 
-/* 카드 등장 애니메이션 */
-.fade-in {
-  opacity: 0;
-  transform: translateY(20px);
-  animation: fadeInUp 0.5s ease forwards;
-}
+@keyframes scrollText { 
+  0% { transform: translateX(0); } 
+  100% { transform: translateX(-100%); } 
+} 
 
-@keyframes fadeInUp {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-</style>
-</head>
+.loader { 
+  border: 4px solid #eee; 
+  border-top: 4px solid #2e7d32; 
+  border-radius: 50%; 
+  width: 30px; 
+  height: 30px; 
+  animation: spin 1s linear infinite; 
+  margin: 20px auto; 
+} 
 
-<body class="centered">
+@keyframes spin { 
+  100% { transform: rotate(360deg); } 
+} 
 
-<img src="https://raw.githubusercontent.com/fafafadola/member-card/main/logo.png" class="logo">
+.fade-in { 
+  opacity: 0; 
+  transform: translateY(20px); 
+  animation: fadeInUp 0.5s ease forwards; 
+} 
 
-<h1>한강지키기운동 남양주지역본부</h1>
-<h3>회원 검색</h3>
+@keyframes fadeInUp { 
+  to { opacity: 1; transform: translateY(0); } 
+} 
+</style> 
+</head> 
 
-<form class="search-box" onsubmit="searchMember(); return false;">
-  <input type="text" id="nameInput" placeholder="이름 입력">
-  <button type="submit">검색</button>
-</form>
+<body class="centered"> 
 
-<div id="result"></div>
+<img src="https://raw.githubusercontent.com/fafafadola/member-card/main/logo.png" class="logo"> 
 
-<script>
-const sheetURL = "https://opensheet.elk.sh/1cxyCAgTDUbpvqTPVq3ZOqZQkw6lBGztqGWDjx7dyp7E/회원DB";
+<h1>한강지키기운동 남양주지역본부</h1> 
+<h3>회원 검색</h3> 
 
-let members = [];
+<form class="search-box" onsubmit="searchMember(); return false;"> 
+<input type="text" id="nameInput" placeholder="이름 입력"> 
+<button type="submit">조회하기</button> <!-- 변경 -->
+</form> 
 
-fetch(sheetURL)
-.then(res => res.json())
-.then(data => members = data.filter(m => m.이름));
+<div id="result"></div> 
 
-function escapeHTML(str) {
-  if (!str) return "";
-  return String(str).replace(/[&<>"']/g, m => ({
-    '&':'&amp;',
-    '<':'&lt;',
-    '>':'&gt;',
-    '"':'&quot;',
-    "'":'&#39;'
-  }[m]));
-}
+<script> 
+const sheetURL = "https://opensheet.elk.sh/1cxyCAgTDUbpvqTPVq3ZOqZQkw6lBGztqGWDjx7dyp7E/회원DB"; 
+let members = []; 
 
-function parseDate(dateStr){
-  if(!dateStr) return null;
-  dateStr = String(dateStr).replace(/[.\s]/g,"-");
-  const d = new Date(dateStr);
-  return isNaN(d.getTime()) ? null : d;
-}
+fetch(sheetURL) 
+.then(res => res.json()) 
+.then(data => members = data.filter(m => m.이름)); 
 
-function formatDate(dateStr) {
-  if (!dateStr) return '';
-  const d = new Date(dateStr);
-  if (isNaN(d.getTime())) return dateStr;
-  return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')}`;
-}
+function escapeHTML(str) { 
+if (!str) return ""; 
+return String(str).replace(/[&<>"']/g, m => ({ 
+'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' 
+}[m])); 
+} 
 
-function searchMember() {
+function parseDate(dateStr){ 
+if(!dateStr) return null; 
+dateStr = String(dateStr).replace(/[.\s]/g,"-"); 
+const d = new Date(dateStr); 
+return isNaN(d.getTime()) ? null : d; 
+} 
 
-  document.body.classList.remove("centered");
+function formatDate(dateStr) { 
+if (!dateStr) return ''; 
+const d = new Date(dateStr); 
+if (isNaN(d.getTime())) return dateStr; 
+return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')}`; 
+} 
 
-  const name = document.getElementById("nameInput").value.trim();
-  const result = document.getElementById("result");
+function searchMember() { 
+document.body.classList.remove("centered"); 
+const name = document.getElementById("nameInput").value.trim(); 
+const result = document.getElementById("result"); 
 
-  if (!name) {
-    result.innerHTML = "이름을 입력하세요";
-    return;
-  }
+if (!name) { 
+result.innerHTML = "이름을 입력하세요"; 
+return; 
+} 
 
-  result.innerHTML = `
-    <div class="loader"></div>
-    <div>검색중...</div>
-  `;
+result.innerHTML = `
+<div class="loader"></div>
+<div>검색중...</div>
+`; 
 
-  setTimeout(() => {
+setTimeout(() => { 
+const filtered = members.filter(m => m.이름 && m.이름.includes(name)); 
 
-    const filtered = members.filter(m => m.이름 && m.이름.includes(name));
+if (filtered.length === 0) { 
+result.innerHTML = "검색 결과 없음"; 
+return; 
+} 
 
-    if (filtered.length === 0) {
-      result.innerHTML = "검색 결과 없음";
-      return;
-    }
+showCard(filtered[0]); 
+}, 300); 
+} 
 
-    showCard(filtered[0]);
+function showCard(m) { 
+const expiry = parseDate(m.유효기간); 
+const isExpired = expiry && expiry < new Date(); 
 
-  }, 300);
-}
+document.getElementById("result").innerHTML = `
+<div class="card ${isExpired ? 'expired-card' : ''} fade-in">
+${isExpired ? `<div class="stamp">사용불가</div>` : ""}
+<h2>회원증</h2>
+<img src="${escapeHTML(m.사진URL)}" class="profile">
 
-function showCard(m) {
+<div class="info-row"><span>회원번호</span><span>${escapeHTML(m.회원번호)}</span></div>
+<div class="info-row"><span>이름</span><span>${escapeHTML(m.이름)}</span></div>
+<div class="info-row"><span>단체명</span><span>${escapeHTML(m.단체명)}</span></div>
 
-  const expiry = parseDate(m.유효기간);
-  const isExpired = expiry && expiry < new Date();
+<div class="info-row">
+<span>유효기간</span>
+<span>${formatDate(m.유효기간)}</span>
+</div>
 
-  document.getElementById("result").innerHTML = `
-    <div class="card ${isExpired ? 'expired-card' : ''} fade-in">
-      ${isExpired ? `<div class="stamp">사용불가</div>` : ""}
+<div class="marquee">
+<span>이 사람은 한강지키기운동 회원임을 인증합니다.</span>
+</div>
 
-      <h2>회원증</h2>
+</div>
+`; 
+} 
+</script> 
 
-      <img src="${escapeHTML(m.사진URL)}" class="profile">
-
-      <div class="info-row"><span>회원번호</span><span>${escapeHTML(m.회원번호)}</span></div>
-      <div class="info-row"><span>이름</span><span>${escapeHTML(m.이름)}</span></div>
-      <div class="info-row"><span>단체명</span><span>${escapeHTML(m.단체명)}</span></div>
-
-      <div class="info-row">
-        <span>유효기간</span>
-        <span>${formatDate(m.유효기간)}</span>
-      </div>
-
-      <div class="marquee">
-        <span>이 사람은 한강지키기운동 회원임을 인증합니다.</span>
-      </div>
-    </div>
-  `;
-}
-</script>
-
-</body>
+</body> 
 </html>
