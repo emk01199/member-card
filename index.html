@@ -15,7 +15,6 @@ body {
   text-align: center;
 }
 
-/* 반응형 중앙 */
 .centered {
   display: flex;
   flex-direction: column;
@@ -23,12 +22,10 @@ body {
   padding-top: clamp(80px, 18vh, 180px);
 }
 
-/* 로고 */
 .logo {
   width: 100px;
 }
 
-/* 제목 */
 h1 {
   font-size: 22px;
   color: #003e8f;
@@ -40,7 +37,6 @@ h3 {
   font-weight: 700;
 }
 
-/* 검색창 */
 .search-box {
   display: flex;
   justify-content: center;
@@ -67,7 +63,6 @@ h3 {
   cursor: pointer;
 }
 
-/* 카드 */
 .card {
   position: relative;
   width: 90%;
@@ -80,7 +75,6 @@ h3 {
   overflow: hidden;
 }
 
-/* 워터마크 */
 .card::before {
   content: "";
   position: absolute;
@@ -94,13 +88,11 @@ h3 {
   transform: translate(-50%, -50%);
 }
 
-/* 만료 */
 .expired-card {
   filter: grayscale(100%);
   opacity: 0.6;
 }
 
-/* 도장 */
 .stamp {
   position: absolute;
   top: 50%;
@@ -114,7 +106,6 @@ h3 {
   background: rgba(255,255,255,0.3);
 }
 
-/* 사진 */
 .profile {
   width: 140px;
   height: 140px;
@@ -124,14 +115,12 @@ h3 {
   border: 1px solid #ccc;
 }
 
-/* 정보 */
 .info-row {
   display: flex;
   justify-content: space-between;
   margin-bottom: 6px;
 }
 
-/* 흐르는 문구 */
 .marquee {
   margin-top: 20px;
   overflow: hidden;
@@ -153,7 +142,6 @@ h3 {
   100% { transform: translateX(-100%); }
 }
 
-/* 로딩 스피너 */
 .loader {
   border: 4px solid #eee;
   border-top: 4px solid #1a5fb4;
@@ -168,7 +156,6 @@ h3 {
   100% { transform: rotate(360deg); }
 }
 
-/* 카드 등장 애니메이션 */
 .fade-in {
   opacity: 0;
   transform: translateY(20px);
@@ -180,3 +167,115 @@ h3 {
 }
 </style>
 </head>
+
+<body class="centered">
+
+<img src="https://raw.githubusercontent.com/fafafadola/member-card/main/logo.png" class="logo">
+
+<h1>한강지키기운동 남양주지역본부</h1>
+<h3>회원 검색</h3>
+
+<form class="search-box" onsubmit="searchMember(); return false;">
+  <input type="text" id="nameInput" placeholder="이름 입력">
+  <button type="submit">조회하기</button>
+</form>
+
+<div id="result"></div>
+
+<script>
+const sheetURL = "https://opensheet.elk.sh/1cxyCAgTDUbpvqTPVq3ZOqZQkw6lBGztqGWDjx7dyp7E/회원DB";
+let members = [];
+
+fetch(sheetURL)
+.then(res => res.json())
+.then(data => members = data.filter(m => m.이름));
+
+function escapeHTML(str) {
+  if (!str) return "";
+  return String(str).replace(/[&<>"']/g, m => ({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#39;'
+  }[m]));
+}
+
+function parseDate(dateStr){
+  if(!dateStr) return null;
+  dateStr = String(dateStr).replace(/[.\s]/g,"-");
+  const d = new Date(dateStr);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return dateStr;
+  return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')}`;
+}
+
+function searchMember() {
+  document.body.classList.remove("centered");
+
+  const name = document.getElementById("nameInput").value.trim();
+  const result = document.getElementById("result");
+
+  if (!name) {
+    result.innerHTML = "이름을 입력하세요";
+    return;
+  }
+
+  result.innerHTML = `
+    <div class="loader"></div>
+    <div>검색중...</div>
+  `;
+
+  setTimeout(() => {
+    const filtered = members.filter(m =>
+      m.이름 && m.이름.replace(/\s/g,'') === name.replace(/\s/g,'')
+    );
+
+    if (filtered.length === 0) {
+      result.innerHTML = "검색 결과 없음";
+      return;
+    }
+
+    showCard(filtered[0]);
+
+  }, 300);
+}
+
+function showCard(m) {
+  const expiry = parseDate(m.유효기간);
+  const isExpired = expiry && expiry < new Date();
+
+  document.getElementById("result").innerHTML = `
+    <div class="card ${isExpired ? 'expired-card' : ''} fade-in">
+
+      ${isExpired ? `<div class="stamp">사용불가</div>` : ""}
+
+      <h2>회원증</h2>
+
+      <img src="${escapeHTML(m.사진URL)}" class="profile">
+
+      <div class="info-row"><span>회원번호</span><span>${escapeHTML(m.회원번호)}</span></div>
+      <div class="info-row"><span>이름</span><span>${escapeHTML(m.이름)}</span></div>
+      <div class="info-row"><span>단체명</span><span>${escapeHTML(m.단체명)}</span></div>
+
+      <div class="info-row">
+        <span>유효기간</span>
+        <span>${formatDate(m.유효기간)}</span>
+      </div>
+
+      <div class="marquee">
+        <span>이 사람은 한강지키기운동 회원임을 인증합니다.</span>
+      </div>
+
+    </div>
+  `;
+}
+</script>
+
+</body>
+</html>
