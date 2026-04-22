@@ -13,6 +13,14 @@ body {
   font-family: "Noto Sans KR", sans-serif;
   background: #eef4fb;
   text-align: center;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  user-select: none;
+}
+
+img {
+  -webkit-user-drag: none;
+  pointer-events: none;
 }
 
 .centered {
@@ -51,6 +59,7 @@ h3 {
   padding: 12px;
   border-radius: 20px;
   border: 1px solid #ccc;
+  user-select: text; /* 입력창은 허용 */
 }
 
 .search-box button {
@@ -183,6 +192,29 @@ h3 {
 <div id="result"></div>
 
 <script>
+// 👉 우클릭 방지
+document.addEventListener('contextmenu', e => e.preventDefault());
+
+// 👉 드래그 방지
+document.addEventListener('dragstart', e => e.preventDefault());
+
+// 👉 모바일 롱프레스(이미지 저장) 방지
+document.addEventListener('touchstart', function(e) {
+  if (e.target.tagName === 'IMG') {
+    e.preventDefault();
+  }
+}, { passive: false });
+
+// 👉 일부 단축키 차단 (F12, Ctrl+S 등)
+document.addEventListener('keydown', function(e) {
+  if (
+    e.key === 'F12' ||
+    (e.ctrlKey && ['s','u','p','c'].includes(e.key.toLowerCase()))
+  ) {
+    e.preventDefault();
+  }
+});
+
 const sheetURL = "https://opensheet.elk.sh/1cxyCAgTDUbpvqTPVq3ZOqZQkw6lBGztqGWDjx7dyp7E/회원DB";
 let members = [];
 
