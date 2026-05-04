@@ -16,6 +16,9 @@ body {
   -webkit-user-select: none;
   -webkit-touch-callout: none;
   user-select: none;
+
+  height: 100dvh;
+  overflow: hidden;
 }
 
 img {
@@ -23,11 +26,16 @@ img {
   pointer-events: none;
 }
 
-.centered {
+.page {
+  height: 100dvh;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   align-items: center;
-  padding-top: clamp(80px, 18vh, 180px);
+}
+
+.hidden {
+  display: none;
 }
 
 .logo {
@@ -59,7 +67,7 @@ h3 {
   padding: 12px;
   border-radius: 20px;
   border: 1px solid #ccc;
-  user-select: text; /* 입력창은 허용 */
+  user-select: text;
 }
 
 .search-box button {
@@ -76,7 +84,6 @@ h3 {
   position: relative;
   width: 90%;
   max-width: 340px;
-  margin: 20px auto;
   border-radius: 12px;
   background: white;
   padding: 25px 20px;
@@ -177,35 +184,37 @@ h3 {
 </style>
 </head>
 
-<body class="centered">
+<body>
 
-<img src="https://raw.githubusercontent.com/fafafadola/member-card/main/logo.png" class="logo">
+<!-- 검색 화면 -->
+<div id="searchPage" class="page">
+  <img src="https://raw.githubusercontent.com/fafafadola/member-card/main/logo.png" class="logo">
 
-<h1>한강지키기운동 남양주지역본부</h1>
-<h3>회원 검색</h3>
+  <h1>한강지키기운동 남양주지역본부</h1>
+  <h3>회원 검색</h3>
 
-<form class="search-box" onsubmit="searchMember(); return false;">
-  <input type="text" id="nameInput" placeholder="이름 입력">
-  <button type="submit">조회하기</button>
-</form>
+  <form class="search-box" onsubmit="searchMember(); return false;">
+    <input type="text" id="nameInput" placeholder="이름 입력">
+    <button type="submit">조회하기</button>
+  </form>
 
-<div id="result"></div>
+  <div id="loading"></div>
+</div>
+
+<!-- 결과 화면 -->
+<div id="resultPage" class="page hidden">
+  <div id="result"></div>
+</div>
 
 <script>
-// 👉 우클릭 방지
+// 기존 방지 기능 유지
 document.addEventListener('contextmenu', e => e.preventDefault());
-
-// 👉 드래그 방지
 document.addEventListener('dragstart', e => e.preventDefault());
 
-// 👉 모바일 롱프레스(이미지 저장) 방지
 document.addEventListener('touchstart', function(e) {
-  if (e.target.tagName === 'IMG') {
-    e.preventDefault();
-  }
+  if (e.target.tagName === 'IMG') e.preventDefault();
 }, { passive: false });
 
-// 👉 일부 단축키 차단 (F12, Ctrl+S 등)
 document.addEventListener('keydown', function(e) {
   if (
     e.key === 'F12' ||
@@ -248,17 +257,15 @@ function formatDate(dateStr) {
 }
 
 function searchMember() {
-  document.body.classList.remove("centered");
-
   const name = document.getElementById("nameInput").value.trim();
-  const result = document.getElementById("result");
+  const loading = document.getElementById("loading");
 
   if (!name) {
-    result.innerHTML = "이름을 입력하세요";
+    loading.innerHTML = "이름을 입력하세요";
     return;
   }
 
-  result.innerHTML = `
+  loading.innerHTML = `
     <div class="loader"></div>
     <div>검색중...</div>
   `;
@@ -269,7 +276,7 @@ function searchMember() {
     );
 
     if (filtered.length === 0) {
-      result.innerHTML = "검색 결과 없음";
+      loading.innerHTML = "검색 결과 없음";
       return;
     }
 
@@ -281,6 +288,9 @@ function searchMember() {
 function showCard(m) {
   const expiry = parseDate(m.유효기간);
   const isExpired = expiry && expiry < new Date();
+
+  document.getElementById("searchPage").classList.add("hidden");
+  document.getElementById("resultPage").classList.remove("hidden");
 
   document.getElementById("result").innerHTML = `
     <div class="card ${isExpired ? 'expired-card' : ''} fade-in">
