@@ -32,6 +32,8 @@ img {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+
+  transform: translateY(-5%); /* 👈 추가된 부분 */
 }
 
 .hidden {
@@ -57,7 +59,7 @@ h3 {
   display: flex;
   justify-content: center;
   gap: 8px;
-  margin: 15px auto;
+  margin: 15px 0;
   width: 90%;
   max-width: 350px;
 }
@@ -84,6 +86,7 @@ h3 {
   position: relative;
   width: 90%;
   max-width: 340px;
+  margin: 0 auto;
   border-radius: 12px;
   background: white;
   padding: 25px 20px;
@@ -203,11 +206,19 @@ h3 {
 
 <!-- 결과 화면 -->
 <div id="resultPage" class="page hidden">
+
+  <img src="https://raw.githubusercontent.com/fafafadola/member-card/main/logo.png" class="logo">
+  <h1>한강지키기운동 남양주지역본부</h1>
+
   <div id="result"></div>
+
+  <button onclick="goBack()" style="margin-top:20px; padding:10px 16px; border-radius:20px; border:none; background:#1a5fb4; color:white; font-weight:700; cursor:pointer;">
+    뒤로가기
+  </button>
 </div>
 
 <script>
-// 기존 방지 기능 유지
+// 기존 스크립트 그대로 유지
 document.addEventListener('contextmenu', e => e.preventDefault());
 document.addEventListener('dragstart', e => e.preventDefault());
 
@@ -316,6 +327,13 @@ function showCard(m) {
 
     </div>
   `;
+}
+
+function goBack() {
+  document.getElementById("resultPage").classList.add("hidden");
+  document.getElementById("searchPage").classList.remove("hidden");
+  document.getElementById("loading").innerHTML = "";
+  document.getElementById("nameInput").value = "";
 }
 </script>
 
