@@ -91,8 +91,7 @@ h3 {
   padding: 25px 20px;
   border: 2px solid #1a5fb4;
   overflow: hidden;
-
-  max-height: 75vh; /* 👉 추가 */
+  max-height: 75vh;
 }
 
 .card::before {
@@ -186,9 +185,10 @@ h3 {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* 👉 핵심 수정 */
+/* 결과 화면만 위로 + 스크롤 */
 #resultPage {
   overflow-y: auto;
+  padding-top: 20px;
 }
 </style>
 </head>
@@ -307,6 +307,8 @@ function showCard(m) {
   document.getElementById("searchPage").classList.add("hidden");
   document.getElementById("resultPage").classList.remove("hidden");
 
+  history.pushState({ page: "result" }, "", ""); // 👉 추가
+
   document.getElementById("result").innerHTML = `
     <div class="card ${isExpired ? 'expired-card' : ''} fade-in">
 
@@ -339,6 +341,15 @@ function goBack() {
   document.getElementById("loading").innerHTML = "";
   document.getElementById("nameInput").value = "";
 }
+
+/* 👉 모바일 뒤로가기 대응 */
+window.addEventListener("popstate", function () {
+  const resultPage = document.getElementById("resultPage");
+
+  if (!resultPage.classList.contains("hidden")) {
+    goBack();
+  }
+});
 </script>
 
 </body>
