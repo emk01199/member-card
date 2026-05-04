@@ -32,7 +32,6 @@ img {
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-
   padding-top: clamp(60px, 12vh, 140px);
 }
 
@@ -92,6 +91,8 @@ h3 {
   padding: 25px 20px;
   border: 2px solid #1a5fb4;
   overflow: hidden;
+
+  max-height: 75vh; /* 👉 추가 */
 }
 
 .card::before {
@@ -185,23 +186,9 @@ h3 {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* ✅ 추가: 카드 자동 축소 */
-.card-wrapper {
-  transform-origin: top center;
-  display: flex;
-  justify-content: center;
-}
-
-@media (max-height: 700px) {
-  .card-wrapper {
-    transform: scale(0.9);
-  }
-}
-
-@media (max-height: 600px) {
-  .card-wrapper {
-    transform: scale(0.8);
-  }
+/* 👉 핵심 수정 */
+#resultPage {
+  overflow-y: auto;
 }
 </style>
 </head>
@@ -321,29 +308,27 @@ function showCard(m) {
   document.getElementById("resultPage").classList.remove("hidden");
 
   document.getElementById("result").innerHTML = `
-    <div class="card-wrapper">
-      <div class="card ${isExpired ? 'expired-card' : ''} fade-in">
+    <div class="card ${isExpired ? 'expired-card' : ''} fade-in">
 
-        ${isExpired ? `<div class="stamp">사용불가</div>` : ""}
+      ${isExpired ? `<div class="stamp">사용불가</div>` : ""}
 
-        <h2>회원증</h2>
+      <h2>회원증</h2>
 
-        <img src="${escapeHTML(m.사진URL)}" class="profile">
+      <img src="${escapeHTML(m.사진URL)}" class="profile">
 
-        <div class="info-row"><span>회원번호</span><span>${escapeHTML(m.회원번호)}</span></div>
-        <div class="info-row"><span>이름</span><span>${escapeHTML(m.이름)}</span></div>
-        <div class="info-row"><span>단체명</span><span>${escapeHTML(m.단체명)}</span></div>
+      <div class="info-row"><span>회원번호</span><span>${escapeHTML(m.회원번호)}</span></div>
+      <div class="info-row"><span>이름</span><span>${escapeHTML(m.이름)}</span></div>
+      <div class="info-row"><span>단체명</span><span>${escapeHTML(m.단체명)}</span></div>
 
-        <div class="info-row">
-          <span>유효기간</span>
-          <span>${formatDate(m.유효기간)}</span>
-        </div>
-
-        <div class="marquee">
-          <span>이 사람은 한강지키기운동 회원임을 인증합니다.</span>
-        </div>
-
+      <div class="info-row">
+        <span>유효기간</span>
+        <span>${formatDate(m.유효기간)}</span>
       </div>
+
+      <div class="marquee">
+        <span>이 사람은 한강지키기운동 회원임을 인증합니다.</span>
+      </div>
+
     </div>
   `;
 }
