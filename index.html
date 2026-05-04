@@ -30,10 +30,10 @@ img {
   height: 100dvh;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
+  justify-content: flex-start;
 
-  transform: translateY(-5%); /* 👈 추가된 부분 */
+  padding-top: clamp(60px, 12vh, 140px);
 }
 
 .hidden {
@@ -184,6 +184,25 @@ h3 {
 @keyframes fadeInUp {
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* ✅ 추가: 카드 자동 축소 */
+.card-wrapper {
+  transform-origin: top center;
+  display: flex;
+  justify-content: center;
+}
+
+@media (max-height: 700px) {
+  .card-wrapper {
+    transform: scale(0.9);
+  }
+}
+
+@media (max-height: 600px) {
+  .card-wrapper {
+    transform: scale(0.8);
+  }
+}
 </style>
 </head>
 
@@ -208,7 +227,6 @@ h3 {
 <div id="resultPage" class="page hidden">
 
   <img src="https://raw.githubusercontent.com/fafafadola/member-card/main/logo.png" class="logo">
-  <h1>한강지키기운동 남양주지역본부</h1>
 
   <div id="result"></div>
 
@@ -218,7 +236,6 @@ h3 {
 </div>
 
 <script>
-// 기존 스크립트 그대로 유지
 document.addEventListener('contextmenu', e => e.preventDefault());
 document.addEventListener('dragstart', e => e.preventDefault());
 
@@ -304,27 +321,29 @@ function showCard(m) {
   document.getElementById("resultPage").classList.remove("hidden");
 
   document.getElementById("result").innerHTML = `
-    <div class="card ${isExpired ? 'expired-card' : ''} fade-in">
+    <div class="card-wrapper">
+      <div class="card ${isExpired ? 'expired-card' : ''} fade-in">
 
-      ${isExpired ? `<div class="stamp">사용불가</div>` : ""}
+        ${isExpired ? `<div class="stamp">사용불가</div>` : ""}
 
-      <h2>회원증</h2>
+        <h2>회원증</h2>
 
-      <img src="${escapeHTML(m.사진URL)}" class="profile">
+        <img src="${escapeHTML(m.사진URL)}" class="profile">
 
-      <div class="info-row"><span>회원번호</span><span>${escapeHTML(m.회원번호)}</span></div>
-      <div class="info-row"><span>이름</span><span>${escapeHTML(m.이름)}</span></div>
-      <div class="info-row"><span>단체명</span><span>${escapeHTML(m.단체명)}</span></div>
+        <div class="info-row"><span>회원번호</span><span>${escapeHTML(m.회원번호)}</span></div>
+        <div class="info-row"><span>이름</span><span>${escapeHTML(m.이름)}</span></div>
+        <div class="info-row"><span>단체명</span><span>${escapeHTML(m.단체명)}</span></div>
 
-      <div class="info-row">
-        <span>유효기간</span>
-        <span>${formatDate(m.유효기간)}</span>
+        <div class="info-row">
+          <span>유효기간</span>
+          <span>${formatDate(m.유효기간)}</span>
+        </div>
+
+        <div class="marquee">
+          <span>이 사람은 한강지키기운동 회원임을 인증합니다.</span>
+        </div>
+
       </div>
-
-      <div class="marquee">
-        <span>이 사람은 한강지키기운동 회원임을 인증합니다.</span>
-      </div>
-
     </div>
   `;
 }
